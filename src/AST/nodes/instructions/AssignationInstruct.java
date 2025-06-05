@@ -1,7 +1,8 @@
-package AVL.nodes.instructions;
+package AST.nodes.instructions;
 
-import AVL.nodes.NodeAVL;
 import java.util.ArrayList;
+
+import AST.nodes.NodeAVL;
 
 public class AssignationInstruct extends NodeAVL{
 

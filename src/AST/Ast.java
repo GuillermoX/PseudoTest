@@ -1,16 +1,16 @@
-package AVL;
+package AST;
 
 import java.util.ArrayList;
 
-import AVL.nodes.NodeAVL;
-import AVL.nodes.blocks.Block;
+import AST.nodes.NodeAVL;
+import AST.nodes.blocks.Block;
 
-public class Avl {
+public class Ast {
 
     private NodeAVL root;
     private NodeAVL current;
 
-    public Avl(){
+    public Ast(){
         root = new Block();
         root.setLvl(-1);
         current = root;

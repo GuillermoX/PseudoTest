@@ -3,13 +3,13 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.Scanner;
 
-import AVL.Avl;
+import AST.Ast;
 
 public class App {
     public static void main(String[] args) throws Exception {
         BufferedReader fr = new BufferedReader(new FileReader(args[0]));
 
-        Avl avl = new Avl();
+        Ast avl = new Ast();
 
         boolean finished = false;
         String nextLine = fr.readLine();

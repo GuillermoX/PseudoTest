@@ -1,4 +1,4 @@
-package AVL.nodes.instructions;
+package AST.nodes.instructions;
 
 public class DeclarationInstruct {
     

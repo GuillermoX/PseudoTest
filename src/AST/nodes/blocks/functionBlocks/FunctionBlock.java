@@ -1,9 +1,9 @@
-package AVL.nodes.blocks.functionBlocks;
+package AST.nodes.blocks.functionBlocks;
 
 import java.util.ArrayList;
 
-import AVL.nodes.blocks.Block;
-import AVL.Enums.Types;;
+import AST.Enums.Types;
+import AST.nodes.blocks.Block;;
 
 public class FunctionBlock extends Block {
     

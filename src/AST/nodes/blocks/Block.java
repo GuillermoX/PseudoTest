@@ -1,8 +1,8 @@
-package AVL.nodes.blocks;
+package AST.nodes.blocks;
 
 import java.util.ArrayList;
 
-import AVL.nodes.NodeAVL;
+import AST.nodes.NodeAVL;
 
 public class Block extends NodeAVL{
    

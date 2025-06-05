@@ -1,8 +1,8 @@
-package AVL.nodes.blocks.controlBlocks;
+package AST.nodes.blocks.controlBlocks;
 
 import java.util.ArrayList;
 
-import AVL.nodes.blocks.Block;
+import AST.nodes.blocks.Block;
 
 public class WhileBlock extends Block{
      
