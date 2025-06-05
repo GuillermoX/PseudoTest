@@ -8,12 +8,13 @@ import AVL.Enums.Types;;
 public class FunctionBlock extends Block {
     
     private String name;
-    private ArrayList<String> params;       //TODO: Use params
+    private String params;       //TODO: Use params
     private Types type;
     
-    public FunctionBlock(String name, String type){
+    public FunctionBlock(String name, String params, String type){
         super();
         this.name = name;
+        this.params = params;
         if(type.compareToIgnoreCase("enter") == 0) this.type = Types.INT;
         else if(type.compareToIgnoreCase("real") == 0) this.type = Types.FLOAT;
         else if(type.compareToIgnoreCase("caràcter") == 0 ||
@@ -37,7 +38,7 @@ public class FunctionBlock extends Block {
         else if(type == Types.CHAR) cType = "char";
 
         //TODO: Add the parameters
-        code.add(ident + cType + " " + name + "()");
+        code.add(ident + cType + " " + name + "(" + params + ")");
         code.add(ident + "{");
 
         int max = super.numBodyParts();

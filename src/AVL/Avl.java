@@ -20,14 +20,14 @@ public class Avl {
 
         boolean finished = false;
 
-        ArrayList<Boolean> ret;
+        int ret;
         ret = ((Block)current).addBodyPart(codeLine);
         
-        if(ret.get(0)){
+        if(ret == -1){
             current = current.getDad();
         }
         
-        if(ret.get(1)){
+        if(ret == 1){
             //Set the current block the newest block created
             current = ((Block)current).getBodyPart(((Block)current).numBodyParts()-1);
         }

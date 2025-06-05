@@ -13,24 +13,21 @@ public class Block extends NodeAVL{
         body = new ArrayList<>();
     }
 
-    public ArrayList<Boolean> addBodyPart(String newCodeLine){
+    public int addBodyPart(String newCodeLine){
         
-        ArrayList<Boolean> ret = new ArrayList<>();        
-        ret.add(false);
-        ret.add(false);
+        int ret = 0;
 
         String[] tokens = newCodeLine.split(" ");
         NodeAVL node = NodeAVL.getNode(tokens);
 
         if(node == null){
-
-            ret.set(0, true);   //Finished block
+            return -1;
         }
         else{
             node.setDad(this);
             node.setLvl(super.getLvl()+1);
             body.add(node);
-            if(node instanceof Block) ret.set(1, true);
+            if(node instanceof Block) ret = 1;
         }
 
         return ret; 

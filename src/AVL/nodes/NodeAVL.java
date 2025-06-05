@@ -1,6 +1,7 @@
 package AVL.nodes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import AVL.nodes.blocks.controlBlocks.*;
 import AVL.nodes.blocks.functionBlocks.FunctionBlock;
@@ -32,13 +33,54 @@ public abstract class NodeAVL {
 
     public static NodeAVL getNode(String[] tokens){
 
-        if((tokens.length == 3) && (tokens[1].compareTo(":=") == 0)) return new AssignationInstruct(tokens[0], tokens[2]);
-        else if(tokens[0].compareToIgnoreCase("si") == 0) return new IfBlock(tokens[1]);
-        else if(tokens[0].compareToIgnoreCase("mentre") == 0) return new WhileBlock(tokens[1]);
-        else if(tokens[0].compareToIgnoreCase("funcio") == 0) return new FunctionBlock(tokens[1], "prueba_type");
-        else if(tokens[0].compareToIgnoreCase("accio") == 0) return new FunctionBlock(tokens[1]);
-        else if(tokens[0].compareToIgnoreCase("algorisme") == 0) return new FunctionBlock("main", "enter");
-        else return null;
+        //Assignation instruction
+        if((tokens.length >= 3) && ((tokens[1].compareTo(":=") == 0) ||
+            (tokens[1].compareTo("<-") == 0))){
+            String assignated = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length));
+            assignated = replaceFormatExpresion(assignated);
+            return new AssignationInstruct(tokens[0], assignated);
+        } 
+       
+
+        //Conditional structure type "if (cond)" and function type
+        if((tokens.length >= 2)){
+            String cond = String.join(" ", Arrays.copyOfRange(tokens, 1, tokens.length));   //Get the conditional part in one String
+            cond = replaceFormatExpresion(cond);
+            if(tokens[0].compareToIgnoreCase("si") == 0) return new IfBlock(cond);
+            if(tokens[0].compareToIgnoreCase("mentre") == 0) return new IfBlock(cond);
+
+            //If it is not conditional it is function
+            if(tokens[0].compareToIgnoreCase("funcio") == 0){
+
+                cond = String.join(" ", Arrays.copyOfRange(tokens, 1, tokens.length-2));
+                String[] params = cond.split("[(]");
+                params = params[1].split("[])]");
+                String[] name = tokens[1].split("[(]");
+                return new FunctionBlock(name[0], params[0], tokens[tokens.length-1]);
+            }  
+            else if(tokens[0].compareToIgnoreCase("accio") == 0){
+
+                cond = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length));
+                String[] params = cond.split("[(]");
+                params = params[1].split("[])]");
+                String[] name = tokens[1].split("[(]");
+                return new FunctionBlock(name[0]);
+            }
+
+        } 
+
+        //Main function or finished blocks
+        if(tokens.length == 1){
+            //Main function
+            if(tokens[0].compareTo("algorisme") == 0) return new FunctionBlock("main", "", "enter");
+            
+            //Finished block
+            if(tokens[0].charAt(0) == 'f') return null;
+        }
+
+
+        //TODO: Only return null when finished block
+        return null;
     }
 
     public String getLvlIdent(int lvl){
@@ -51,5 +93,17 @@ public abstract class NodeAVL {
     }
 
     public abstract void printNode(ArrayList<String> code);
+
+    private static String replaceFormatExpresion(String line){
+
+        line = line.replace(" i ", " && ");
+        line = line.replace(" o ", " || ");
+        line = line.replaceAll("\\bno\\b", "!");   //Replace "no" with "!" only when is not in a word
+        line = line.replace("! ", "!");            //Special case
+        line = line.replace("=", "==");
+
+
+        return line;
+    }
 
 }
