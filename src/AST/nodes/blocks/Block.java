@@ -2,7 +2,10 @@ package AST.nodes.blocks;
 
 import java.util.ArrayList;
 
+import AST.exceptions.SyntaxException;
+import AST.exceptions.UnknownInstructionException;
 import AST.nodes.NodeAVL;
+import AST.Ast;
 
 public class Block extends NodeAVL{
    
@@ -13,12 +16,12 @@ public class Block extends NodeAVL{
         body = new ArrayList<>();
     }
 
-    public int addBodyPart(String newCodeLine){
+    public int addBodyPart(String newCodeLine, Ast ast) throws UnknownInstructionException, SyntaxException{
         
         int ret = 0;
 
         String[] tokens = newCodeLine.split(" ");
-        NodeAVL node = NodeAVL.getNode(tokens);
+        NodeAVL node = ast.getNode(tokens);
 
         if(node == null){
             return -1;
