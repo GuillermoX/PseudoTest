@@ -17,7 +17,7 @@ public class WhileBlock extends Block{
     public void printNode(ArrayList<String> code){
         String ident = super.getLvlIdent(super.getLvl());
 
-        code.add(ident + "while " + condition);
+        code.add(ident + "while " + "(" + condition + ")");
         code.add(ident + "{");
 
         int max = super.numBodyParts();

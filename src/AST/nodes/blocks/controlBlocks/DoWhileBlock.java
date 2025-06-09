@@ -28,7 +28,7 @@ public class DoWhileBlock extends Block{
             super.getBodyPart(i).printNode(code);
         }
 
-        code.add(ident + "} while " + condition + ";");
+        code.add(ident + "} while " + "(" + condition + ");");
 
     }
 }

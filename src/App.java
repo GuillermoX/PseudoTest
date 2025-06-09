@@ -12,27 +12,28 @@ public class App {
 
         Ast avl = new Ast();
 
-        boolean finished = false;
         String nextLine = fr.readLine();
         int lineCount = 1;
         try{
 
 
             while(nextLine != null){
-                nextLine = nextLine.replaceFirst("^\\s+", "");
+                nextLine = nextLine.trim();
                 if(nextLine.compareTo("") != 0){
-                    finished = avl.addCode(nextLine);
+                    avl.addCode(nextLine);
                 }
                 nextLine = fr.readLine();
                 lineCount ++;
             }
 
 
-            avl.printCode();
+            avl.printCode(args[1]);
         }
         catch(UnknownInstructionException | SyntaxException e){
             System.err.println(e + " [Line " + lineCount + "]");
         }
+
+        fr.close();
 
     }
 }

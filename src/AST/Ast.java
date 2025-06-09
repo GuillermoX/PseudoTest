@@ -1,7 +1,11 @@
 package AST;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 
 import AST.exceptions.SyntaxException;
 import AST.exceptions.UnknownInstructionException;
@@ -28,16 +32,27 @@ public class Ast {
         boolean finished = false;
 
         int ret;
-        ret = ((Block)current).addBodyPart(codeLine, this);
-        
-        if(ret == -1){
-            current = current.getDad();
+
+
+        //If "else" statement no new node to create
+        if(codeLine.compareToIgnoreCase("sino") == 0){
+            if(current instanceof IfBlock) ((IfBlock)current).addElseBody();
+            else throw new SyntaxException("no \"si ... llavors\" structure to use \"sino\"");
+        }
+        else{
+
+            ret = ((Block)current).addBodyPart(codeLine, this);
+
+            if(ret == -1){
+                current = current.getDad();
+            }
+
+            if(ret == 1){
+                //Set the current block the newest block created
+                current = ((Block)current).getBodyPart(((Block)current).numBodyParts()-1);
+            }
         }
         
-        if(ret == 1){
-            //Set the current block the newest block created
-            current = ((Block)current).getBodyPart(((Block)current).numBodyParts()-1);
-        }
 
         if(current == null) finished = true;
         return finished;
@@ -48,49 +63,59 @@ public class Ast {
 
     public NodeAVL getNode(String[] tokens) throws UnknownInstructionException, SyntaxException{
 
-        //Assignation instruction
-        if((tokens.length >= 3) && ((tokens[1].compareTo(":=") == 0) ||
-            (tokens[1].compareTo("<-") == 0))){
-            String assignated = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length));
-            assignated = replaceFormatExpresion(assignated);
-            return new AssignationInstruct(tokens[0], assignated);
-        } 
 
-       
-
-        //Conditional structure type "if (cond)" and function type
-        if((tokens.length >= 2)){
-            String cond = String.join(" ", Arrays.copyOfRange(tokens, 1, tokens.length));   //Get the conditional part in one String
-            cond = replaceFormatExpresion(cond);
-            if(tokens[0].compareToIgnoreCase("si") == 0) return new IfBlock(cond);
-            if(tokens[0].compareToIgnoreCase("mentre") == 0){
-                if(this.current instanceof DoWhileBlock){
-                    ((DoWhileBlock)current).addCond(cond);      //Add the condition to the block
-                    return null;                                //If inside of a do-while block finish block
-                } 
-                else return new WhileBlock(cond);                       //Else create while block
+        if(tokens.length >= 3){
+            //Assignation instruction
+            if((tokens[1].compareTo(":=") == 0) || (tokens[1].compareTo("<-") == 0)){
+                String assignated = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length));
+                assignated = replaceFormatExpresion(assignated);
+                return new AssignationInstruct(tokens[0], assignated);
             }
+        }
+
+        if(tokens.length == 5){
 
             //If it is not conditional it is function
             if(tokens[0].compareToIgnoreCase("funcio") == 0){
 
-                cond = String.join(" ", Arrays.copyOfRange(tokens, 1, tokens.length-2));
-                String[] params = cond.split("[(]");
-                params = params[1].split("[])]");
-                String[] name = tokens[1].split("[(]");
-                return new FunctionBlock(name[0], params[0], tokens[tokens.length-1]);
+                return new FunctionBlock(tokens[1], tokens[2], tokens[4]);
             }  
-            else if(tokens[0].compareToIgnoreCase("accio") == 0){
+        }
 
-                cond = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length));
-                String[] params = cond.split("[(]");
-                params = params[1].split("[])]");
-                String[] name = tokens[1].split("[(]");
-                return new FunctionBlock(name[0]);
+
+        if(tokens.length == 3)
+        {
+
+            //Conditional structure
+            String cond = replaceFormatExpresion(tokens[1]);
+            //If structure
+            if(tokens[0].compareToIgnoreCase("si") == 0){
+                if(tokens[tokens.length-1].compareToIgnoreCase("llavors") != 0) throw new SyntaxException("missing \"llavors\" in \"si ... llavors\" structure");
+                return new IfBlock(cond);
+            } 
+            //While structure
+            if(tokens[0].compareToIgnoreCase("mentre") == 0){
+                if(tokens[tokens.length-1].compareToIgnoreCase("fer") != 0) throw new SyntaxException("missing \"fer\" in \"mentre ... fer\" loop");
+                return new WhileBlock(cond);                       //Else create while block
+            }
+
+
+            if(tokens[0].compareToIgnoreCase("accio") == 0){
+                return new FunctionBlock(tokens[1], tokens[2]);
             }
 
         } 
 
+
+        if(tokens.length == 2){
+
+            //Conditional structure
+            String cond = replaceFormatExpresion(tokens[1]);
+            if((tokens[0].compareToIgnoreCase("mentre") == 0) && (this.current instanceof DoWhileBlock)){
+                ((DoWhileBlock)current).addCond(cond);      //Add the condition to the block
+                return null;                                //If inside of a do-while block finish block
+            } 
+        }
         //One token word
         if(tokens.length == 1){
             //Main function
@@ -99,28 +124,21 @@ public class Ast {
             //Do while block
             if(tokens[0].compareToIgnoreCase("fer") == 0) return new DoWhileBlock();
 
+
             //Finished block
-            //TODO: Improve logical structure of comparisons
-            if(tokens[0].compareToIgnoreCase("fsi") == 0){
-                if(current instanceof IfBlock) return null;
-                else throw new SyntaxException("expected " + getExpectedFinishBlock(current)); 
+            if(((tokens[0].compareToIgnoreCase("fsi") == 0) && (current instanceof IfBlock)) ||
+               ((tokens[0].compareToIgnoreCase("fmentre") == 0) && (current instanceof WhileBlock)) ||
+               ((tokens[0].compareToIgnoreCase("ffuncio") == 0) && (current instanceof FunctionBlock)) ||
+               ((tokens[0].compareToIgnoreCase("faccio") == 0) && (current instanceof FunctionBlock)) ||
+               ((tokens[0].compareToIgnoreCase("falgorisme") == 0) && (current instanceof FunctionBlock))){
+
+                    return null;    //If closing block instruction is correct
             }
-            else if(tokens[0].compareToIgnoreCase("fmentre") == 0){
-                if(current instanceof WhileBlock) return null;
-                else throw new SyntaxException("expected "  + getExpectedFinishBlock(current)); 
+            else{
+                throw new SyntaxException("expected " + getExpectedFinishBlock(current));
             }
-            else if(tokens[0].compareToIgnoreCase("ffuncio") == 0){
-                if(current instanceof FunctionBlock) return null;
-                else throw new SyntaxException("expected "  + getExpectedFinishBlock(current)); 
-            }
-            else if(tokens[0].compareToIgnoreCase("faccio") == 0){
-                if(current instanceof FunctionBlock) return null;
-                else throw new SyntaxException("expected "  + getExpectedFinishBlock(current)); 
-            }
-            else if(tokens[0].compareToIgnoreCase("falgorisme") == 0){
-                if(current instanceof FunctionBlock) return null;
-                else throw new SyntaxException("expected " + getExpectedFinishBlock(current)); 
-            }
+               
+
         }
 
 
@@ -139,6 +157,27 @@ public class Ast {
         }
     }
 
+
+    public int printCode(String filePath){
+        try{
+
+            BufferedWriter fw = new BufferedWriter(new FileWriter(filePath));
+            ArrayList<String> code = new ArrayList<>();
+
+            root.printNode(code);
+
+            for(String s : code){
+                fw.write(s);
+                fw.newLine();
+            }
+
+            fw.close();
+
+            return 0;
+        }
+        catch(IOException e){return -1;}
+    }
+
     private static String replaceFormatExpresion(String line){
 
         line = line.replace(" i ", " && ");
@@ -153,9 +192,10 @@ public class Ast {
 
     private static String getExpectedFinishBlock(NodeAVL block){
         String finish = "";
-        if(block instanceof IfBlock) finish = "fsi";
-        else if (block instanceof WhileBlock) finish = "fmentre";
-        else if (block instanceof FunctionBlock) finish = "ffuncio / faccio / falgorisme";
+        if(block instanceof IfBlock) finish = "\"fsi\"";
+        else if (block instanceof WhileBlock) finish = "\"fmentre\"";
+        else if (block instanceof FunctionBlock) finish = "\"ffuncio / faccio / falgorisme\"";
+        else finish = "nothing";
         return finish;
     }
 

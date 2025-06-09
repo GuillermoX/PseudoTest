@@ -1,6 +1,8 @@
 package AST.nodes.blocks;
 
 import java.util.ArrayList;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 import AST.exceptions.SyntaxException;
 import AST.exceptions.UnknownInstructionException;
@@ -20,8 +22,19 @@ public class Block extends NodeAVL{
         
         int ret = 0;
 
-        String[] tokens = newCodeLine.split(" ");
+        //Get tokens 
+        ArrayList<String> tokensList = new ArrayList<>();
+        tokensList = splitTokens(newCodeLine);
+
+        String[] tokens = new String[tokensList.size()];
+        for(int i = 0; i < tokensList.size(); i++){
+            String tokenString = tokensList.get(i);
+            tokens[i] = tokenString.replaceAll("^\\(|\\)$", "");
+        } 
+
+        //Get new node type
         NodeAVL node = ast.getNode(tokens);
+
 
         if(node == null){
             return -1;
@@ -53,6 +66,46 @@ public class Block extends NodeAVL{
             getBodyPart(i).printNode(code);
         }
 
+    }
+
+    public static ArrayList<String> splitTokens(String text) {
+        ArrayList<String> tokens = new ArrayList<>();
+        StringBuilder currentToken = new StringBuilder();
+        boolean insideParentheses = false;
+        int parenthesesLevel = 0;
+
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+
+            if (c == '(') {
+                if (parenthesesLevel > 0) currentToken.append(c);
+                parenthesesLevel++;
+                insideParentheses = true;
+            } else if (c == ')') {
+                parenthesesLevel--;
+                if (parenthesesLevel == 0) {
+                    insideParentheses = false;
+                    tokens.add("(" + currentToken.toString() + ")");
+                    currentToken.setLength(0);
+                } else {
+                    currentToken.append(c);
+                }
+            } else if (Character.isWhitespace(c) && !insideParentheses) {
+                if (currentToken.length() > 0) {
+                    tokens.add(currentToken.toString());
+                    currentToken.setLength(0);
+                }
+            } else {
+                currentToken.append(c);
+            }
+        }
+
+        // Add the last token if any
+        if (currentToken.length() > 0) {
+            tokens.add(currentToken.toString());
+        }
+
+        return tokens;
     }
 
 }

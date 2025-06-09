@@ -22,6 +22,14 @@ public class FunctionBlock extends Block {
         //TODO: TypeError
     }
 
+
+    public FunctionBlock(String name, String params){
+        super();
+        this.name = name;
+        this.params = params;
+        this.type = Types.VOID;
+    }
+
     public FunctionBlock(String name){
         super();
         this.name = name;
