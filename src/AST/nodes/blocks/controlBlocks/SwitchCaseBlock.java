@@ -1,35 +1,31 @@
 package AST.nodes.blocks.controlBlocks;
 
-import AST.nodes.blocks.Block;
-
-import java.lang.runtime.SwitchBootstraps;
 import java.util.ArrayList;
 
+import AST.nodes.blocks.Block;
 
-public class SwitchBlock extends Block{
+
+public class SwitchCaseBlock extends Block{
     
-    
-    private String var;
-    
-    public SwitchBlock(String var){
+    private String cas;
+
+    public SwitchCaseBlock(String cas){
         super();
-        this.var = var;
+        this.cas = cas;
     }
 
 
     public void printNode(ArrayList<String> code){
         String ident = super.getLvlIdent(super.getLvl());
 
-        code.add(ident + "switch " + "(" + var + ")");
-        code.add(ident + "{");
+        code.add(ident + "case " + cas + ":");
          
         int max = super.numBodyParts();
         for(int i = 0; i < max; i++){
             super.getBodyPart(i).printNode(code);
         }
 
-        code.add(ident + "}");
+        code.add(ident + "\tbreak;");
 
     }
-
 }
