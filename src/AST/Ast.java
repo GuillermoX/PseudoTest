@@ -2,10 +2,12 @@ package AST;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.util.Queue;
 
 import AST.exceptions.SyntaxException;
 import AST.exceptions.UnknownInstructionException;
@@ -52,16 +54,9 @@ public class Ast {
                 tokens[i] = tokenString;
             } 
 
-            //Get new node type
-            NodeAVL node = this.getNode(tokens);
+            //Add the new instruction to AST
+            this.addInstruct(tokens);
 
-            if(node != null){
-                ((Block)current).addBodyPart(node);
-                if(node instanceof Block) current = node;
-            }
-            else{
-                current = current.getDad();
-            }
 
         }
         
@@ -73,17 +68,20 @@ public class Ast {
 
 
 
-    public NodeAVL getNode(String[] tokens) throws UnknownInstructionException, SyntaxException{
+    public void addInstruct(String[] tokens) throws UnknownInstructionException, SyntaxException{
 
-        NodeAVL returnNode = null;
+        Queue<NodeAVL> newNodes = new ArrayDeque<>();        //Stack to add at the end all the new Nodes
+        Queue<String> newInstruct = new ArrayDeque<>();        //Stack to add at the end all the new Nodes
+        //NodeAVL node = null;
         boolean correct = true;
+        int finishedBlocks = 0;
 
 
         if(tokens.length == 5){
             //If it is not conditional it is function
             if(tokens[0].compareToIgnoreCase("funcio") == 0){
                 tokens[2] = tokens[2].substring(1, tokens[2].length()-1);
-                returnNode = new FunctionBlock(tokens[1], tokens[2], tokens[4]);
+                newNodes.add(new FunctionBlock(tokens[1], tokens[2], tokens[4]));
             }  
             else{
                 correct = false;
@@ -98,17 +96,17 @@ public class Ast {
             //If structure
             if(tokens[0].compareToIgnoreCase("si") == 0){
                 if(tokens[tokens.length-1].compareToIgnoreCase("llavors") != 0) throw new SyntaxException("missing \"llavors\" in \"si ... llavors\" structure");
-                returnNode = new IfBlock(cond);
+                newNodes.add(new IfBlock(cond));
             } 
             //While structure
             else if(tokens[0].compareToIgnoreCase("mentre") == 0){
                 if(tokens[tokens.length-1].compareToIgnoreCase("fer") != 0) throw new SyntaxException("missing \"fer\" in \"mentre ... fer\" loop");
-                returnNode = new WhileBlock(cond);                       //Else create while block
+                newNodes.add(new WhileBlock(cond));                       //Else create while block
             }
             //Void function
             else if(tokens[0].compareToIgnoreCase("accio") == 0){   
                 tokens[2] = tokens[2].substring(1, tokens[2].length()-1);
-                returnNode = new FunctionBlock(tokens[1], tokens[2]);
+                newNodes.add(new FunctionBlock(tokens[1], tokens[2]));
             }
             else{
                 correct = false;
@@ -123,11 +121,11 @@ public class Ast {
             //Finishing do while block
             if((tokens[0].compareToIgnoreCase("mentre") == 0) && (this.current instanceof DoWhileBlock)){
                 ((DoWhileBlock)current).addCond(cond);      //Add the condition to the block
-                returnNode = null;                                //If inside of a do-while block finish block
+                finishedBlocks = 1;                               //If inside of a do-while block finish block
             } 
             //Switch structure
             else if(tokens[0].compareToIgnoreCase("opcio") == 0){
-                returnNode = new SwitchBlock(cond);
+                newNodes.add(new SwitchBlock(cond));
             }
             else{
                 correct = false;
@@ -136,10 +134,10 @@ public class Ast {
         //One token word
         else if(tokens.length == 1){
             //Main function
-            if(tokens[0].compareTo("algorisme") == 0) returnNode = new FunctionBlock("main", "", "enter");
+            if(tokens[0].compareTo("algorisme") == 0) newNodes.add(new FunctionBlock("main", "", "enter"));
             
             //Do while block
-            else if(tokens[0].compareToIgnoreCase("fer") == 0) returnNode = new DoWhileBlock();
+            else if(tokens[0].compareToIgnoreCase("fer") == 0) newNodes.add(new DoWhileBlock());
 
 
             //Finished block
@@ -150,11 +148,11 @@ public class Ast {
                    ((tokens[0].compareToIgnoreCase("faccio") == 0) && (current instanceof FunctionBlock)) ||
                    ((tokens[0].compareToIgnoreCase("falgorisme") == 0) && (current instanceof FunctionBlock))){
 
-                    returnNode = null;    //If closing block instruction is correct
+                    finishedBlocks = 1;     //If closing block instruction return to previous block
                 }
                 else if(((tokens[0].compareToIgnoreCase("fopcio") == 0) && ((current instanceof SwitchBlock) || (current instanceof SwitchCaseBlock)))){
-                    if(current instanceof SwitchCaseBlock) current = current.getDad();
-                    returnNode = null;
+                    if(current instanceof SwitchCaseBlock) finishedBlocks = 2;
+                    else finishedBlocks = 1;
                 }
                 else{
                     throw new SyntaxException("expected " + getExpectedFinishBlock(current));
@@ -177,14 +175,18 @@ public class Ast {
             if(tokens.length >= 3 && ((tokens[1].compareTo(":=") == 0) || (tokens[1].compareTo("<-") == 0))){
                 String assignated = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length));
                 assignated = replaceFormatExpresion(assignated);
-                returnNode = new AssignationInstruct(tokens[0], assignated);
+                newNodes.add(new AssignationInstruct(tokens[0], assignated));
             }
             //Switch structure case
             else if(tokens[0].charAt(tokens[0].length()-1) == ':'){
                 //TODO: Add the first instruction of case
                 if(current instanceof SwitchBlock || current instanceof SwitchCaseBlock){
-                    if(current instanceof SwitchCaseBlock) current = current.getDad();
-                    returnNode = new SwitchCaseBlock(tokens[0].substring(0, tokens[0].length()-1));
+                    if(current instanceof SwitchCaseBlock) finishedBlocks = 1;
+                    newNodes.add(new SwitchCaseBlock(tokens[0].substring(0, tokens[0].length()-1)));
+                    if(tokens.length > 1){ 
+                        String instruct = String.join(" ", Arrays.copyOfRange(tokens, 1, tokens.length));
+                        newInstruct.add(instruct);
+                    }
                 }
                 else{   //If case but not in Switch block
                     throw new SyntaxException("missing \"opcio\" structure to create case");
@@ -202,9 +204,24 @@ public class Ast {
             //If it's not any of the previous cases the expression/instruction doesn't exist
             throw new UnknownInstructionException(String.join(" ", Arrays.copyOfRange(tokens, 0, tokens.length)));
         }
-        
-        return returnNode;
 
+
+        //Return to previous blocks
+        for(int i = 0; i < finishedBlocks; i++){
+            current = current.getDad();
+        }
+
+        //Add the new nodes if necessary
+        while(!newNodes.isEmpty()){
+            NodeAVL node = newNodes.poll();
+            ((Block)current).addBodyPart(node);
+            if(node instanceof Block) current = node;
+        }
+
+        //Add new instructions inside this one (only switch case block for the moment)
+        while(!newInstruct.isEmpty()){
+            this.addCode(newInstruct.poll());
+        }
 
     }
 
