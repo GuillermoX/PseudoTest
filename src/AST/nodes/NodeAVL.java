@@ -1,12 +1,6 @@
 package AST.nodes;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-
-import AST.exceptions.UnknownInstructionException;
-import AST.nodes.blocks.controlBlocks.*;
-import AST.nodes.blocks.functionBlocks.FunctionBlock;
-import AST.nodes.instructions.AssignationInstruct;
 
 public abstract class NodeAVL {
     private NodeAVL dad;

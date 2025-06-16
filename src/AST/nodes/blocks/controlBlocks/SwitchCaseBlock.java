@@ -15,10 +15,22 @@ public class SwitchCaseBlock extends Block{
     }
 
 
+    public SwitchCaseBlock(){
+        super();
+        this.cas = null;    //default case
+    }
+
+    public boolean isDefault(){
+        if(cas == null) return true;
+        else return false;
+    }
+
+
     public void printNode(ArrayList<String> code){
         String ident = super.getLvlIdent(super.getLvl());
 
-        code.add(ident + "case " + cas + ":");
+        if(cas != null) code.add(ident + "case " + cas + ":");
+        else code.add(ident + "default:");
          
         int max = super.numBodyParts();
         for(int i = 0; i < max; i++){

@@ -40,10 +40,7 @@ public class FunctionBlock extends Block {
     public void printNode(ArrayList<String> code) {
         
         String ident = super.getLvlIdent(super.getLvl());
-        String cType = "void";
-        if(type == Types.INT) cType = "int";
-        else if(type == Types.FLOAT) cType = "float";
-        else if(type == Types.CHAR) cType = "char";
+        String cType = type.print();
 
         //TODO: Add the parameters
         code.add(ident + cType + " " + name + "(" + params + ")");

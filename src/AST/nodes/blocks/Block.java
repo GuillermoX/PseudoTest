@@ -1,13 +1,8 @@
 package AST.nodes.blocks;
 
 import java.util.ArrayList;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
-import AST.exceptions.SyntaxException;
-import AST.exceptions.UnknownInstructionException;
 import AST.nodes.NodeAVL;
-import AST.Ast;
 
 public class Block extends NodeAVL{
    

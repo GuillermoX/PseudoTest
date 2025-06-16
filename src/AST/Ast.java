@@ -6,15 +6,14 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.util.Queue;
 
+import AST.Enums.Types;
 import AST.exceptions.SyntaxException;
 import AST.exceptions.UnknownInstructionException;
 import AST.nodes.NodeAVL;
 import AST.nodes.blocks.Block;
 import AST.nodes.blocks.controlBlocks.*;
-import AST.nodes.blocks.definitionBlocks.*;
 import AST.nodes.blocks.functionBlocks.*;
 import AST.nodes.instructions.*;
 
@@ -32,8 +31,6 @@ public class Ast {
     public boolean addCode(String codeLine) throws UnknownInstructionException, SyntaxException{
 
         boolean finished = false;
-
-        int ret;
 
 
         //If "else" statement no new node to create
@@ -140,6 +137,13 @@ public class Ast {
             else if(tokens[0].compareToIgnoreCase("fer") == 0) newNodes.add(new DoWhileBlock());
 
 
+            //Constant, variable and starting code blocks (ignore)
+            else if((tokens[0].compareToIgnoreCase("const") == 0) || (tokens[0].compareToIgnoreCase("var") == 0) ||
+                    (tokens[0].compareToIgnoreCase("fconst") == 0) || (tokens[0].compareToIgnoreCase("fvar") == 0) ||
+                    (tokens[0].compareToIgnoreCase("inici") == 0)){
+                    //Do nothing to avoid else case
+            }
+
             //Finished block
             else if(tokens[0].charAt(0) == 'f'){
                 if(((tokens[0].compareToIgnoreCase("fsi") == 0) && (current instanceof IfBlock)) ||
@@ -171,18 +175,38 @@ public class Ast {
         //If not any of the prev instructions
         if(!correct){
             correct = true;
+
+            //Declaration instruction
+            if((tokens.length >= 2) && (tokens[tokens.length-2].contains(":") ||
+                                        tokens[tokens.length-1].contains(":"))){
+                newNodes.add(new DeclarationInstruct("pruebaVar", Types.CHAR));     //TODO: This is a placeholder
+            }
             //Assignation instruction
-            if(tokens.length >= 3 && ((tokens[1].compareTo(":=") == 0) || (tokens[1].compareTo("<-") == 0))){
+            else if(tokens.length >= 3 && ((tokens[1].compareTo(":=") == 0) || (tokens[1].compareTo("<-") == 0))){
                 String assignated = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length));
                 assignated = replaceFormatExpresion(assignated);
                 newNodes.add(new AssignationInstruct(tokens[0], assignated));
             }
+            //Return instruction
+            else if(tokens[0].compareToIgnoreCase("retorna") == 0){
+                String retur = String.join(" ", Arrays.copyOfRange(tokens, 1, tokens.length));
+                retur = replaceFormatExpresion(retur);
+                newNodes.add(new ReturnInstruct(retur));
+            }
             //Switch structure case
-            else if(tokens[0].charAt(tokens[0].length()-1) == ':'){
+            else if((tokens[0].charAt(tokens[0].length()-1) == ':') || (tokens[1].charAt(tokens[1].length()-1) == ':') ){
                 //TODO: Add the first instruction of case
                 if(current instanceof SwitchBlock || current instanceof SwitchCaseBlock){
                     if(current instanceof SwitchCaseBlock) finishedBlocks = 1;
-                    newNodes.add(new SwitchCaseBlock(tokens[0].substring(0, tokens[0].length()-1)));
+                    //If default case move all tokens one position to left because "default" in pseudo uses two tokens
+                    if((tokens[0].compareToIgnoreCase("altre") == 0) &&
+                       (tokens[1].compareToIgnoreCase("cas:") == 0)){
+                        tokens = Arrays.copyOfRange(tokens, 1, tokens.length);  //get rid of the first token
+                        newNodes.add(new SwitchCaseBlock());    //default case block
+                    }
+                    else{
+                        newNodes.add(new SwitchCaseBlock(tokens[0].substring(0, tokens[0].length()-1)));
+                    }
                     if(tokens.length > 1){ 
                         String instruct = String.join(" ", Arrays.copyOfRange(tokens, 1, tokens.length));
                         newInstruct.add(instruct);
