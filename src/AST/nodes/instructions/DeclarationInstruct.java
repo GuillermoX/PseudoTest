@@ -34,11 +34,12 @@ public class DeclarationInstruct extends NodeAVL {
         this.lenght = 1;
     }
 
+
     public void printNode(ArrayList<String> code){
         String ident = super.getLvlIdent(super.getLvl());
         String varStr = "";
         for(int i = 0; i < vars.size()-1; i++){
-            varStr += vars.get(i) + ",";
+            varStr += vars.get(i) + ", ";
         }
         varStr += vars.get(vars.size()-1);    //Add last variable without coma
         code.add(ident + type.print() + " " + varStr + ";");

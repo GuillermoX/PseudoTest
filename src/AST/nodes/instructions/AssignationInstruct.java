@@ -15,6 +15,14 @@ public class AssignationInstruct extends NodeAVL{
         this.assignator = assignator;
     }
 
+    public String getAssignated(){
+        return assignated;
+    }
+
+    public String getAssignator(){
+        return assignator;
+    }
+
 
 
     public void printNode(ArrayList<String> code){

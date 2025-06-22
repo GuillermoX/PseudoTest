@@ -16,16 +16,22 @@ import AST.nodes.blocks.Block;
 import AST.nodes.blocks.controlBlocks.*;
 import AST.nodes.blocks.functionBlocks.*;
 import AST.nodes.instructions.*;
+import AST.nodes.blocks.definitionBlocks.*;
 
 public class Ast {
 
     private NodeAVL root;
     private NodeAVL current;
+    private NodeAVL lastCurrent;    //To save current when changing to other spaces
+    private NodeAVL cnst;   //Constant block
 
     public Ast(){
         root = new Block();
         root.setLvl(-1);
         current = root;
+        ConstantDefBlock constBlock = new ConstantDefBlock();
+        ((Block)current).addBodyPart(constBlock);
+        cnst = constBlock;
     }
 
     public boolean addCode(String codeLine) throws UnknownInstructionException, SyntaxException{
@@ -89,7 +95,11 @@ public class Ast {
 
             //Conditional structure
             String cond = replaceFormatExpresion(tokens[1]);
-            cond = cond.substring(1, cond.length()-1);
+            //Replace "()" to " "
+            StringBuilder strBuild = new StringBuilder(cond);
+            strBuild.setCharAt(cond.length()-1, ' ');
+            strBuild.setCharAt(0, ' ');
+            cond = strBuild.toString();
             //If structure
             if(tokens[0].compareToIgnoreCase("si") == 0){
                 if(tokens[tokens.length-1].compareToIgnoreCase("llavors") != 0) throw new SyntaxException("missing \"llavors\" in \"si ... llavors\" structure");
@@ -135,22 +145,33 @@ public class Ast {
             
             //Do while block
             else if(tokens[0].compareToIgnoreCase("fer") == 0) newNodes.add(new DoWhileBlock());
+            
+            //Variable definition block
+            else if(tokens[0].compareToIgnoreCase("var") == 0) newNodes.add(new VarDefBlock());
+
+            //Constant variable definition block
+            else if(tokens[0].compareToIgnoreCase("const") == 0){
+                this.lastCurrent = this.current;
+                this.current = this.cnst;  //Go to the const definition space
+            } 
 
 
             //Constant, variable and starting code blocks (ignore)
-            else if((tokens[0].compareToIgnoreCase("const") == 0) || (tokens[0].compareToIgnoreCase("var") == 0) ||
-                    (tokens[0].compareToIgnoreCase("fconst") == 0) || (tokens[0].compareToIgnoreCase("fvar") == 0) ||
-                    (tokens[0].compareToIgnoreCase("inici") == 0)){
+            else if((tokens[0].compareToIgnoreCase("inici") == 0)){
                     //Do nothing to avoid else case
             }
 
             //Finished block
             else if(tokens[0].charAt(0) == 'f'){
-                if(((tokens[0].compareToIgnoreCase("fsi") == 0) && (current instanceof IfBlock)) ||
+                if(((tokens[0].compareToIgnoreCase("fconst") == 0) && (current instanceof ConstantDefBlock))){
+                    this.current = this.lastCurrent;    //Return to the previous node before changing to constant space
+                }
+                else if(((tokens[0].compareToIgnoreCase("fsi") == 0) && (current instanceof IfBlock)) ||
                    ((tokens[0].compareToIgnoreCase("fmentre") == 0) && (current instanceof WhileBlock)) ||
                    ((tokens[0].compareToIgnoreCase("ffuncio") == 0) && (current instanceof FunctionBlock)) ||
                    ((tokens[0].compareToIgnoreCase("faccio") == 0) && (current instanceof FunctionBlock)) ||
-                   ((tokens[0].compareToIgnoreCase("falgorisme") == 0) && (current instanceof FunctionBlock))){
+                   ((tokens[0].compareToIgnoreCase("falgorisme") == 0) && (current instanceof FunctionBlock)) ||
+                   ((tokens[0].compareToIgnoreCase("fvar") == 0) && (current instanceof VarDefBlock))){
 
                     finishedBlocks = 1;     //If closing block instruction return to previous block
                 }
@@ -179,13 +200,34 @@ public class Ast {
             //Declaration instruction
             if((tokens.length >= 2) && (tokens[tokens.length-2].contains(":") ||
                                         tokens[tokens.length-1].contains(":"))){
-                newNodes.add(new DeclarationInstruct("pruebaVar", Types.CHAR));     //TODO: This is a placeholder
+                //Remove ":" from tokens
+                if(tokens[tokens.length-2].contains(":")) tokens[tokens.length-2] = tokens[tokens.length-2].replace(":", "");
+                else tokens[tokens.length-1] = tokens[tokens.length-1].replace(":", "");
+                
+                //Get all variables into array
+                String[] vars = String.join("", Arrays.copyOfRange(tokens, 0, tokens.length-1)).split(",");
+                ArrayList<String> varsArray = new ArrayList<>();
+                for(int i = 0; i < vars.length; i++) varsArray.add(vars[i]);
+
+                //Get the type of variable/s
+                Types type = Types.getType(tokens[tokens.length-1]);
+                
+
+                newNodes.add(new DeclarationInstruct(varsArray, type));     //TODO: This is a placeholder
             }
             //Assignation instruction
             else if(tokens.length >= 3 && ((tokens[1].compareTo(":=") == 0) || (tokens[1].compareTo("<-") == 0))){
                 String assignated = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length));
                 assignated = replaceFormatExpresion(assignated);
-                newNodes.add(new AssignationInstruct(tokens[0], assignated));
+                NodeAVL newNode;
+                //If in Constant Definition Block add to the constants space of AST
+                if(current instanceof ConstantDefBlock){
+                    newNode = new DefineInstruct(tokens[0], assignated);
+                }
+                else{   //If not Constant definition Block
+                    newNode = new AssignationInstruct(tokens[0], assignated);
+                }
+                newNodes.add(newNode);
             }
             //Return instruction
             else if(tokens[0].compareToIgnoreCase("retorna") == 0){
@@ -195,7 +237,6 @@ public class Ast {
             }
             //Switch structure case
             else if((tokens[0].charAt(tokens[0].length()-1) == ':') || (tokens[1].charAt(tokens[1].length()-1) == ':') ){
-                //TODO: Add the first instruction of case
                 if(current instanceof SwitchBlock || current instanceof SwitchCaseBlock){
                     if(current instanceof SwitchCaseBlock) finishedBlocks = 1;
                     //If default case move all tokens one position to left because "default" in pseudo uses two tokens
@@ -297,6 +338,7 @@ public class Ast {
         if(block instanceof IfBlock) finish = "\"fsi\"";
         else if (block instanceof WhileBlock) finish = "\"fmentre\"";
         else if (block instanceof FunctionBlock) finish = "\"ffuncio / faccio / falgorisme\"";
+        else if (block instanceof VarDefBlock) finish = "\"fvar\"";
         else finish = "nothing";
         return finish;
     }
