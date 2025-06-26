@@ -3,22 +3,38 @@ package AST.nodes.blocks.functionBlocks;
 import java.util.ArrayList;
 
 import AST.Enums.Types;
-import AST.nodes.blocks.Block;;
+import AST.nodes.blocks.Block;
 
 public class FunctionBlock extends Block {
     
+    private class Param{
+        private String name;
+        private boolean isIO;   //To know if it's In/Out parameter
+
+        public Param(String name, boolean isIO){
+            this.name = name;
+            this.isIO = isIO;
+        }
+
+        public String getName(){
+            return name;
+        }
+
+        public boolean isIO(){
+            return isIO;
+        }
+    }
+
     private String name;
     private String params;       //TODO: Use params
-    private Types type;
+    private Types type; 
+
     
-    public FunctionBlock(String name, String params, String type){
+    public FunctionBlock(String name, String params, Types type){
         super();
         this.name = name;
         this.params = params;
-        if(type.compareToIgnoreCase("enter") == 0) this.type = Types.INT;
-        else if(type.compareToIgnoreCase("real") == 0) this.type = Types.FLOAT;
-        else if(type.compareToIgnoreCase("caràcter") == 0 ||
-                type.compareToIgnoreCase("caracter") == 0) this.type = Types.CHAR;
+        this.type = type;
         //TODO: TypeError
     }
 
@@ -54,5 +70,18 @@ public class FunctionBlock extends Block {
         code.add(ident + "}");
 
     }
+
+
+    private static void parseParams(String paramStr){
+
+        String[] params = paramStr.split(",");
+
+        for(int i = 0; i < params.length-1; i++){
+
+            boolean paramIO = params[i].matches(".*\\bvar\\b.*");   //Check if it's IO
+        }
+
+    }
+
 
 }

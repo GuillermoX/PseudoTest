@@ -84,7 +84,9 @@ public class Ast {
             //If it is not conditional it is function
             if(tokens[0].compareToIgnoreCase("funcio") == 0){
                 tokens[2] = tokens[2].substring(1, tokens[2].length()-1);
-                newNodes.add(new FunctionBlock(tokens[1], tokens[2], tokens[4]));
+                tokens[2] = tokens[2].replaceAll("\\bvar\\b", "*");   //Replace "no" with "!" only when is not in a word
+                Types type = Types.getType(tokens[4]);
+                newNodes.add(new FunctionBlock(tokens[1], tokens[2], type));
             }  
             else{
                 correct = false;
@@ -141,7 +143,7 @@ public class Ast {
         //One token word
         else if(tokens.length == 1){
             //Main function
-            if(tokens[0].compareTo("algorisme") == 0) newNodes.add(new FunctionBlock("main", "", "enter"));
+            if(tokens[0].compareTo("algorisme") == 0) newNodes.add(new FunctionBlock("main", "", Types.INT));
             
             //Do while block
             else if(tokens[0].compareToIgnoreCase("fer") == 0) newNodes.add(new DoWhileBlock());
@@ -193,27 +195,17 @@ public class Ast {
             correct = false;
         }
 
-        //If not any of the prev instructions
+        //Not defined lenght instructions
         if(!correct){
             correct = true;
 
             //Declaration instruction
-            if((tokens.length >= 2) && (tokens[tokens.length-2].contains(":") ||
-                                        tokens[tokens.length-1].contains(":"))){
-                //Remove ":" from tokens
-                if(tokens[tokens.length-2].contains(":")) tokens[tokens.length-2] = tokens[tokens.length-2].replace(":", "");
-                else tokens[tokens.length-1] = tokens[tokens.length-1].replace(":", "");
-                
-                //Get all variables into array
-                String[] vars = String.join("", Arrays.copyOfRange(tokens, 0, tokens.length-1)).split(",");
-                ArrayList<String> varsArray = new ArrayList<>();
-                for(int i = 0; i < vars.length; i++) varsArray.add(vars[i]);
+            if(DeclarationInstruct.isDeclaration(tokens)){
 
-                //Get the type of variable/s
-                Types type = Types.getType(tokens[tokens.length-1]);
+                DeclarationInstruct decInstr = DeclarationInstruct.getDeclarationInstruct(tokens);
+                newNodes.add(decInstr);
                 
 
-                newNodes.add(new DeclarationInstruct(varsArray, type));     //TODO: This is a placeholder
             }
             //Assignation instruction
             else if(tokens.length >= 3 && ((tokens[1].compareTo(":=") == 0) || (tokens[1].compareTo("<-") == 0))){
@@ -306,6 +298,9 @@ public class Ast {
 
             BufferedWriter fw = new BufferedWriter(new FileWriter(filePath));
             ArrayList<String> code = new ArrayList<>();
+            
+            fw.write("#include <stdbool.h>");
+            fw.newLine();
 
             root.printNode(code);
 
@@ -328,6 +323,8 @@ public class Ast {
         line = line.replace("=", "==");
         line = line.replaceAll("\\bno\\b", "!");   //Replace "no" with "!" only when is not in a word
         line = line.replace("! ", "!");            //Special case
+        line = line.replaceAll("\\bcert\\b", "true");   //Replace "no" with "!" only when is not in a word
+        line = line.replaceAll("\\bfals\\b", "false");   //Replace "no" with "!" only when is not in a word
 
 
         return line;
@@ -381,5 +378,37 @@ public class Ast {
 
         return tokens;
     }
+
+    private static int isDeclaration(String[] tokens){
+        boolean found = false;
+        int i = tokens.length-1;
+        //Find ":"
+        while(!found && i>=0){
+            found = tokens[i].contains(":");
+            i--;
+        }
+        i ++;
+
+        if(found){
+            int diff = (tokens.length - (i+1));
+            if(diff > 1){   //check if it's table, because it may be a switch case
+                found = false;
+                int j = tokens.length-1;
+                while(!found && j>=0){
+                    found = tokens[j].contains("taula");
+                    j--;
+                }
+
+                if(!found) i = -1;
+            }
+            else if(diff == 0) i = -1;      //it must be switch case
+        }
+        else{
+            i = -1;
+        }
+
+        return i;
+    }
+
 
 }
