@@ -1,24 +1,29 @@
 package AST.nodes.blocks.functionBlocks;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import AST.Enums.Types;
+import AST.exceptions.SyntaxException;
 import AST.nodes.blocks.Block;
+import AST.nodes.instructions.DeclarationInstruct;
 
 public class FunctionBlock extends Block {
     
-    private class Param{
-        private String name;
+    private static class Param{
+        private DeclarationInstruct dec;
         private boolean isIO;   //To know if it's In/Out parameter
 
-        public Param(String name, boolean isIO){
-            this.name = name;
+        public Param(DeclarationInstruct dec, boolean isIO){
+            this.dec = dec;
             this.isIO = isIO;
         }
 
-        public String getName(){
-            return name;
+        public DeclarationInstruct getDeclaration(){
+            return dec;
         }
+        
+
 
         public boolean isIO(){
             return isIO;
@@ -26,23 +31,25 @@ public class FunctionBlock extends Block {
     }
 
     private String name;
-    private String params;       //TODO: Use params
+    private ArrayList<Param> params;       //TODO: Use params
     private Types type; 
 
     
-    public FunctionBlock(String name, String params, Types type){
+    public FunctionBlock(String name, String params, Types type) throws SyntaxException{
         super();
         this.name = name;
-        this.params = params;
+        this.params = new ArrayList<>();
+        this.parseParams(params);
         this.type = type;
         //TODO: TypeError
     }
 
 
-    public FunctionBlock(String name, String params){
+    public FunctionBlock(String name, String params) throws SyntaxException{
         super();
-        this.name = name;
-        this.params = params;
+        this.name = name; 
+        this.params = new ArrayList<>();
+        this.parseParams(params);
         this.type = Types.VOID;
     }
 
@@ -52,14 +59,31 @@ public class FunctionBlock extends Block {
         this.type = Types.VOID;
     }
 
+    public ArrayList<String> getIOParamsNames(){
+        ArrayList<String> paramNames = new ArrayList<>();
+
+        for(Param p : this.params){
+            if(p.isIO) paramNames.add(p.getDeclaration().getVarName(0));
+        }
+
+        return paramNames;
+    }
+
+
     @Override
     public void printNode(ArrayList<String> code) {
         
         String ident = super.getLvlIdent(super.getLvl());
         String cType = type.print();
 
+        String paramStr = "";
+        for(int i = 0; i < this.params.size(); i ++){
+            paramStr += this.params.get(i).getDeclaration().printAsParam(this.params.get(i).isIO());
+            if(i != (this.params.size()-1)) paramStr += ", ";
+        }
+
         //TODO: Add the parameters
-        code.add(ident + cType + " " + name + "(" + params + ")");
+        code.add(ident + cType + " " + name + "(" + paramStr + ")");
         code.add(ident + "{");
 
         int max = super.numBodyParts();
@@ -72,13 +96,28 @@ public class FunctionBlock extends Block {
     }
 
 
-    private static void parseParams(String paramStr){
+    private void parseParams(String paramStr) throws SyntaxException{
 
-        String[] params = paramStr.split(",");
+        if(paramStr.compareTo("") != 0){
 
-        for(int i = 0; i < params.length-1; i++){
+            String[] paramsArr = paramStr.split(",");
 
-            boolean paramIO = params[i].matches(".*\\bvar\\b.*");   //Check if it's IO
+            for(int i = 0; i < paramsArr.length; i++){
+                boolean isInOut = false;
+
+                paramsArr[i] = paramsArr[i].replaceFirst("^\\s", "");   //Delete first white spaces
+                paramsArr[i] = paramsArr[i].replaceAll("\\s+", " ");    //Delete repeated white spaces
+                String[] tokens = paramsArr[i].split(" ");
+                if(tokens[0].compareToIgnoreCase("var") == 0){      //If it's IO
+                    isInOut = true;
+                    tokens = Arrays.copyOfRange(tokens, 1, tokens.length);
+                }
+
+                DeclarationInstruct dec = DeclarationInstruct.getDeclarationInstruct(tokens);   //Get the declaration of the param 
+                Param param = new Param(dec, isInOut);
+                this.params.add(param);
+
+            }
         }
 
     }

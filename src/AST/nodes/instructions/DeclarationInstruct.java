@@ -2,6 +2,7 @@ package AST.nodes.instructions;
 
 import AST.nodes.NodeAVL;
 import AST.Enums.Types;
+import AST.exceptions.SyntaxException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +25,20 @@ public class DeclarationInstruct extends NodeAVL {
         this.vars = vars;
         this.type = type;
         this.dims = dims;
+    }
+
+    public String getVarName(int index){
+        try{
+            return vars.get(index);
+
+        }
+        catch(IndexOutOfBoundsException e){
+            return "";
+        }
+    }
+
+    public Types getType(){
+        return type;
     }
 
 
@@ -55,7 +70,39 @@ public class DeclarationInstruct extends NodeAVL {
     }
 
 
-    public static DeclarationInstruct getDeclarationInstruct(String[] tokens){
+    public String printAsParam(boolean isIO){
+
+        //Add the dimensions into one String
+        String dimStr = "";
+        if(this.dims != null){
+
+            for(String d : this.dims){
+                dimStr += "[" + d + "]";
+            }
+        }
+
+        //Add the variables in one String
+        String varStr = "";
+        for(int i = 0; i < vars.size(); i++){
+            varStr += vars.get(i);
+            if(this.dims != null){
+                varStr += dimStr;
+            }
+            
+            if(i != vars.size()-1) varStr += ", ";
+
+        }
+
+        String retStr = type.print();
+        if(isIO) retStr += "*";
+        retStr += " " + varStr;
+
+        return retStr;
+ 
+    }
+
+
+    public static DeclarationInstruct getDeclarationInstruct(String[] tokens) throws SyntaxException{
 
         int posDec = getDeclarationDelim(tokens);
         //Remove ":" from tokens
@@ -113,7 +160,7 @@ public class DeclarationInstruct extends NodeAVL {
         return i != -1;
     }
 
-    private static int getDeclarationDelim(String[] tokens){
+    private static int getDeclarationDelim(String[] tokens) throws SyntaxException{
 
         boolean found = false;
         int i = tokens.length-1;
@@ -134,12 +181,12 @@ public class DeclarationInstruct extends NodeAVL {
                     j--;
                 }
 
-                if(!found) i = -1;
+                if(!found) throw new SyntaxException("Bad variable/parameter declaration, expected array");
             }
             else if(diff == 0) i = -1;      //it must be switch case
         }
         else{
-            i = -1;
+           throw new SyntaxException("Bad variable/parameter declaration, no \":\" found"); 
         }
 
         return i;

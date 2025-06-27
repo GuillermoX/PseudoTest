@@ -22,6 +22,7 @@ public class Ast {
 
     private NodeAVL root;
     private NodeAVL current;
+    private NodeAVL currentFunct;
     private NodeAVL lastCurrent;    //To save current when changing to other spaces
     private NodeAVL cnst;   //Constant block
 
@@ -84,9 +85,10 @@ public class Ast {
             //If it is not conditional it is function
             if(tokens[0].compareToIgnoreCase("funcio") == 0){
                 tokens[2] = tokens[2].substring(1, tokens[2].length()-1);
-                tokens[2] = tokens[2].replaceAll("\\bvar\\b", "*");   //Replace "no" with "!" only when is not in a word
                 Types type = Types.getType(tokens[4]);
-                newNodes.add(new FunctionBlock(tokens[1], tokens[2], type));
+                NodeAVL newFunct = new FunctionBlock(tokens[1], tokens[2], type);
+                newNodes.add(newFunct);
+                currentFunct = newFunct;
             }  
             else{
                 correct = false;
@@ -115,7 +117,9 @@ public class Ast {
             //Void function
             else if(tokens[0].compareToIgnoreCase("accio") == 0){   
                 tokens[2] = tokens[2].substring(1, tokens[2].length()-1);
-                newNodes.add(new FunctionBlock(tokens[1], tokens[2]));
+                NodeAVL newFunct = new FunctionBlock(tokens[1], tokens[2]);
+                newNodes.add(newFunct);
+                currentFunct = newFunct;
             }
             else{
                 correct = false;
@@ -143,7 +147,12 @@ public class Ast {
         //One token word
         else if(tokens.length == 1){
             //Main function
-            if(tokens[0].compareTo("algorisme") == 0) newNodes.add(new FunctionBlock("main", "", Types.INT));
+            if(tokens[0].compareTo("algorisme") == 0){
+                NodeAVL newFunct = new FunctionBlock("main", "", Types.INT);
+                newNodes.add(newFunct);
+                currentFunct = newFunct;
+
+            } 
             
             //Do while block
             else if(tokens[0].compareToIgnoreCase("fer") == 0) newNodes.add(new DoWhileBlock());
@@ -209,6 +218,7 @@ public class Ast {
             }
             //Assignation instruction
             else if(tokens.length >= 3 && ((tokens[1].compareTo(":=") == 0) || (tokens[1].compareTo("<-") == 0))){
+                tokens[0] = replaceFormatExpresion(tokens[0]);
                 String assignated = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length));
                 assignated = replaceFormatExpresion(assignated);
                 NodeAVL newNode;
@@ -316,7 +326,7 @@ public class Ast {
         catch(IOException e){return -1;}
     }
 
-    private static String replaceFormatExpresion(String line){
+    private String replaceFormatExpresion(String line){
 
         line = line.replace(" i ", " && ");
         line = line.replace(" o ", " || ");
@@ -325,6 +335,12 @@ public class Ast {
         line = line.replace("! ", "!");            //Special case
         line = line.replaceAll("\\bcert\\b", "true");   //Replace "no" with "!" only when is not in a word
         line = line.replaceAll("\\bfals\\b", "false");   //Replace "no" with "!" only when is not in a word
+
+        //Add * to all IO parameters
+        ArrayList<String> params = ((FunctionBlock)currentFunct).getIOParamsNames();
+        for(String p : params){
+            line = line.replaceAll("\\b" + p + "\\b", "*" + p);
+        }
 
 
         return line;
