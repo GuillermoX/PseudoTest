@@ -9,14 +9,14 @@ import java.io.BufferedWriter;
 import java.util.Queue;
 
 import AST.Enums.Types;
-import AST.exceptions.SyntaxException;
-import AST.exceptions.UnknownInstructionException;
+import AST.exceptions.*;
 import AST.nodes.NodeAVL;
 import AST.nodes.blocks.Block;
 import AST.nodes.blocks.controlBlocks.*;
 import AST.nodes.blocks.functionBlocks.*;
 import AST.nodes.instructions.*;
 import AST.nodes.blocks.definitionBlocks.*;
+import AST.nodes.blocks.definitionBlocks.structureBlock.*;
 
 public class Ast {
 
@@ -25,6 +25,7 @@ public class Ast {
     private NodeAVL currentFunct;
     private NodeAVL lastCurrent;    //To save current when changing to other spaces
     private NodeAVL cnst;   //Constant block
+    private ArrayList<FunctionBlock> functions;
 
     public Ast(){
         root = new Block();
@@ -33,9 +34,10 @@ public class Ast {
         ConstantDefBlock constBlock = new ConstantDefBlock();
         ((Block)current).addBodyPart(constBlock);
         cnst = constBlock;
+        functions = new ArrayList<>();
     }
 
-    public boolean addCode(String codeLine) throws UnknownInstructionException, SyntaxException{
+    public boolean addCode(String codeLine) throws UnknownInstructionException, SyntaxException, UnknownFunctionCallException{
 
         boolean finished = false;
 
@@ -72,7 +74,7 @@ public class Ast {
 
 
 
-    public void addInstruct(String[] tokens) throws UnknownInstructionException, SyntaxException{
+    public void addInstruct(String[] tokens) throws UnknownInstructionException, SyntaxException, UnknownFunctionCallException{
 
         Queue<NodeAVL> newNodes = new ArrayDeque<>();        //Stack to add at the end all the new Nodes
         Queue<String> newInstruct = new ArrayDeque<>();        //Stack to add at the end all the new Nodes
@@ -88,6 +90,7 @@ public class Ast {
                 Types type = Types.getType(tokens[4]);
                 NodeAVL newFunct = new FunctionBlock(tokens[1], tokens[2], type);
                 newNodes.add(newFunct);
+                functions.add((FunctionBlock)newFunct);    //Add the function to the function list of the AST
                 currentFunct = newFunct;
             }  
             else{
@@ -119,6 +122,7 @@ public class Ast {
                 tokens[2] = tokens[2].substring(1, tokens[2].length()-1);
                 NodeAVL newFunct = new FunctionBlock(tokens[1], tokens[2]);
                 newNodes.add(newFunct);
+                functions.add((FunctionBlock)newFunct);    //Add the function to the function list of the AST
                 currentFunct = newFunct;
             }
             else{
@@ -136,9 +140,18 @@ public class Ast {
                 ((DoWhileBlock)current).addCond(cond);      //Add the condition to the block
                 finishedBlocks = 1;                               //If inside of a do-while block finish block
             } 
+            //Structure type definition
+            else if(tokens[1].compareToIgnoreCase("registre") == 0){
+                String structName = tokens[0].replace(":", "");
+                newNodes.add(new StructureBlock(structName));
+            }
             //Switch structure
             else if(tokens[0].compareToIgnoreCase("opcio") == 0){
                 newNodes.add(new SwitchBlock(cond));
+            }
+            else if(tokens[1].contains("(") && tokens[1].contains(")")){
+                ArrayList<String> paramsCorrect = getParamsCorrected(tokens[0], cond);
+                newNodes.add(new FunctionCallInstruct(tokens[0], paramsCorrect));
             }
             else{
                 correct = false;
@@ -166,6 +179,9 @@ public class Ast {
                 this.current = this.cnst;  //Go to the const definition space
             } 
 
+            //Structure definition block
+            else if(tokens[0].compareToIgnoreCase("tipus") == 0) newNodes.add(new StructureDefBlock());
+
 
             //Constant, variable and starting code blocks (ignore)
             else if((tokens[0].compareToIgnoreCase("inici") == 0)){
@@ -182,7 +198,9 @@ public class Ast {
                    ((tokens[0].compareToIgnoreCase("ffuncio") == 0) && (current instanceof FunctionBlock)) ||
                    ((tokens[0].compareToIgnoreCase("faccio") == 0) && (current instanceof FunctionBlock)) ||
                    ((tokens[0].compareToIgnoreCase("falgorisme") == 0) && (current instanceof FunctionBlock)) ||
-                   ((tokens[0].compareToIgnoreCase("fvar") == 0) && (current instanceof VarDefBlock))){
+                   ((tokens[0].compareToIgnoreCase("fvar") == 0) && (current instanceof VarDefBlock)) ||
+                   ((tokens[0].compareToIgnoreCase("ftipus") == 0) && (current instanceof StructureDefBlock)) ||
+                   ((tokens[0].compareToIgnoreCase("fregistre") == 0) && (current instanceof StructureBlock))){
 
                     finishedBlocks = 1;     //If closing block instruction return to previous block
                 }
@@ -337,9 +355,11 @@ public class Ast {
         line = line.replaceAll("\\bfals\\b", "false");   //Replace "no" with "!" only when is not in a word
 
         //Add * to all IO parameters
-        ArrayList<String> params = ((FunctionBlock)currentFunct).getIOParamsNames();
-        for(String p : params){
-            line = line.replaceAll("\\b" + p + "\\b", "*" + p);
+        if((currentFunct instanceof FunctionBlock) && currentFunct != null){
+            ArrayList<String> params = ((FunctionBlock)currentFunct).getIOParamsNames();
+            for(String p : params){
+                line = line.replaceAll("\\b" + p + "\\b", "*" + p);
+            }
         }
 
 
@@ -426,5 +446,39 @@ public class Ast {
         return i;
     }
 
+
+    private ArrayList<String> getParamsCorrected(String functName, String params) throws UnknownFunctionCallException, SyntaxException {
+        //Check if function exists
+        boolean found = false;
+        int i = 0;
+        while(!found && (i < this.functions.size())){
+            //Check for every function declared if matches to the current function call
+            found = this.functions.get(i).getName().compareToIgnoreCase(functName) == 0;
+            i++;
+        }
+        if(!found) throw new UnknownFunctionCallException(functName);
+        i --;
+
+        FunctionBlock currentFunct = this.functions.get(i);
+        ArrayList<Param> paramsFunct = currentFunct.getParams();  //Get the function
+
+        //Check for every parameter if needed IO indication (&)
+        String[] arrayParams = params.split(",");
+        i = 0;
+        while(i < arrayParams.length && i < paramsFunct.size()){
+            //TODO: Check if variable is also IO param in function
+            if(paramsFunct.get(i).isIO()) arrayParams[i] = "&" + "(" + arrayParams[i] + ")";
+            i++;
+        }
+        if((i != paramsFunct.size()) || (i != arrayParams.length)) throw new SyntaxException("number of parameters not maching the function definition");
+
+
+        ArrayList<String> retParams = new ArrayList<>();
+        for(int j = 0; j < arrayParams.length; j++){
+            retParams.add(arrayParams[j]);
+        }
+
+        return retParams;
+    }
 
 }

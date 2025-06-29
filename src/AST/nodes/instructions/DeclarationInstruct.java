@@ -10,6 +10,7 @@ import java.util.Arrays;
 public class DeclarationInstruct extends NodeAVL {
     ArrayList<String> vars; 
     Types type;
+    String typeName;                //Name for the type in case it's a struct
     ArrayList<String> dims;         //In case the new(s) variable(s) is an array
 
 
@@ -41,6 +42,10 @@ public class DeclarationInstruct extends NodeAVL {
         return type;
     }
 
+    public void setTypeName(String name){
+        this.typeName = name;
+    }
+
 
     public void printNode(ArrayList<String> code){
         String ident = super.getLvlIdent(super.getLvl());
@@ -66,7 +71,10 @@ public class DeclarationInstruct extends NodeAVL {
 
         }
 
-        code.add(ident + type.print() + " " + varStr + ";");
+        String typePrint = type.print();
+        if(this.type == Types.STRUCT) typePrint = typeName;
+
+        code.add(ident + typePrint + " " + varStr + ";");
     }
 
 
@@ -94,6 +102,7 @@ public class DeclarationInstruct extends NodeAVL {
         }
 
         String retStr = type.print();
+        if(this.type == Types.STRUCT) retStr = typeName;
         if(isIO) retStr += "*";
         retStr += " " + varStr;
 
@@ -119,12 +128,17 @@ public class DeclarationInstruct extends NodeAVL {
 
         ArrayList<String> tableValues = isTableDeclaration(tokens);     //TODO: Add inicializated values table
 
+        DeclarationInstruct decInstr;
         if(tableValues == null){
-            return new DeclarationInstruct(varsArray, type);
+            decInstr = new DeclarationInstruct(varsArray, type);
         }
         else{
-            return new DeclarationInstruct(varsArray, type, tableValues);
+            decInstr = new DeclarationInstruct(varsArray, type, tableValues);
         }
+
+        if(type == Types.STRUCT) decInstr.setTypeName(tokens[tokens.length-1]);     //Set the name for the type of the instruction if it's a struct
+
+        return decInstr;
     }
 
 

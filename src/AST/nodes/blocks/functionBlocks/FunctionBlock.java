@@ -7,28 +7,10 @@ import AST.Enums.Types;
 import AST.exceptions.SyntaxException;
 import AST.nodes.blocks.Block;
 import AST.nodes.instructions.DeclarationInstruct;
+import AST.nodes.blocks.functionBlocks.Param;
 
 public class FunctionBlock extends Block {
     
-    private static class Param{
-        private DeclarationInstruct dec;
-        private boolean isIO;   //To know if it's In/Out parameter
-
-        public Param(DeclarationInstruct dec, boolean isIO){
-            this.dec = dec;
-            this.isIO = isIO;
-        }
-
-        public DeclarationInstruct getDeclaration(){
-            return dec;
-        }
-        
-
-
-        public boolean isIO(){
-            return isIO;
-        }
-    }
 
     private String name;
     private ArrayList<Param> params;       //TODO: Use params
@@ -59,15 +41,27 @@ public class FunctionBlock extends Block {
         this.type = Types.VOID;
     }
 
+    public String getName(){
+        return this.name;
+    }
+
+    public ArrayList<Param> getParams(){
+        return params;
+    }
+
     public ArrayList<String> getIOParamsNames(){
         ArrayList<String> paramNames = new ArrayList<>();
 
         for(Param p : this.params){
-            if(p.isIO) paramNames.add(p.getDeclaration().getVarName(0));
+            if(p.isIO()) paramNames.add(p.getDeclaration().getVarName(0));
         }
 
         return paramNames;
     }
+
+
+
+
 
 
     @Override
