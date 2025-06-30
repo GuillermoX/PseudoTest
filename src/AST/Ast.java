@@ -149,8 +149,10 @@ public class Ast {
             else if(tokens[0].compareToIgnoreCase("opcio") == 0){
                 newNodes.add(new SwitchBlock(cond));
             }
-            else if(tokens[1].contains("(") && tokens[1].contains(")")){
-                ArrayList<String> paramsCorrect = getParamsCorrected(tokens[0], cond);
+            //Function Call
+            else if(tokens[1].charAt(0) == '(' && tokens[1].charAt(tokens[1].length()-1) == ')'){
+                String[] params = cond.split(",");
+                ArrayList<String> paramsCorrect = getParamsCorrected(tokens[0], params);
                 newNodes.add(new FunctionCallInstruct(tokens[0], paramsCorrect));
             }
             else{
@@ -344,15 +346,19 @@ public class Ast {
         catch(IOException e){return -1;}
     }
 
-    private String replaceFormatExpresion(String line){
+    private String replaceFormatExpresion(String line) throws UnknownFunctionCallException, SyntaxException{
 
         line = line.replace(" i ", " && ");
         line = line.replace(" o ", " || ");
         line = line.replace("=", "==");
+        line = line.replaceAll("\\bdiv\\b", "/");   //Replace "div" with "/" only when is not in a word
         line = line.replaceAll("\\bno\\b", "!");   //Replace "no" with "!" only when is not in a word
         line = line.replace("! ", "!");            //Special case
-        line = line.replaceAll("\\bcert\\b", "true");   //Replace "no" with "!" only when is not in a word
-        line = line.replaceAll("\\bfals\\b", "false");   //Replace "no" with "!" only when is not in a word
+        line = line.replaceAll("\\bcert\\b", "true");   //Replace "cert" with "true" only when is not in a word
+        line = line.replaceAll("\\bfals\\b", "false");   //Replace "fals" with "false" only when is not in a word
+
+
+        line = getInLineFunctionCallCorrected(line);
 
         //Add * to all IO parameters
         if((currentFunct instanceof FunctionBlock) && currentFunct != null){
@@ -447,7 +453,7 @@ public class Ast {
     }
 
 
-    private ArrayList<String> getParamsCorrected(String functName, String params) throws UnknownFunctionCallException, SyntaxException {
+    private ArrayList<String> getParamsCorrected(String functName, String[] params) throws UnknownFunctionCallException, SyntaxException {
         //Check if function exists
         boolean found = false;
         int i = 0;
@@ -463,22 +469,85 @@ public class Ast {
         ArrayList<Param> paramsFunct = currentFunct.getParams();  //Get the function
 
         //Check for every parameter if needed IO indication (&)
-        String[] arrayParams = params.split(",");
         i = 0;
-        while(i < arrayParams.length && i < paramsFunct.size()){
+        while(i < params.length && i < paramsFunct.size()){
             //TODO: Check if variable is also IO param in function
-            if(paramsFunct.get(i).isIO()) arrayParams[i] = "&" + "(" + arrayParams[i] + ")";
+            if(paramsFunct.get(i).isIO()) params[i] = "&" + "(" + params[i] + ")";
             i++;
         }
-        if((i != paramsFunct.size()) || (i != arrayParams.length)) throw new SyntaxException("number of parameters not maching the function definition");
+        if((i != paramsFunct.size()) || (i != params.length)) throw new SyntaxException("number of parameters not maching the function definition");
 
 
         ArrayList<String> retParams = new ArrayList<>();
-        for(int j = 0; j < arrayParams.length; j++){
-            retParams.add(arrayParams[j]);
+        for(int j = 0; j < params.length; j++){
+            retParams.add(params[j]);
         }
 
         return retParams;
     }
+
+    private String getInLineFunctionCallCorrected(String codeLine) throws UnknownFunctionCallException, SyntaxException{
+        StringBuilder line = new StringBuilder();
+        StringBuilder functName = new StringBuilder();
+        boolean validChar = false;
+
+        for(int i = 0; i < codeLine.length(); i++){
+            char currChar = codeLine.charAt(i);
+            if((i != codeLine.length()-1) && (validChar && currChar == '(') && (functName.length() != 0)){
+                ArrayList<String> params = new ArrayList<>();
+                StringBuilder param = new StringBuilder();
+
+                int j = i+1;
+                currChar = codeLine.charAt(j);
+                while(currChar != ')' && j < codeLine.length()){
+                    if(currChar == ','){
+                        params.add(param.toString());
+                        param.setLength(0);
+                    }
+                    else{
+                        param.append(currChar);
+                    }
+
+                    j++;
+                    currChar = codeLine.charAt(j);
+                }
+                params.add(param.toString());
+
+                String[] paramsArray = new String[params.size()];
+                for(int k = 0; k < params.size(); k++) paramsArray[k] = params.get(k);
+                
+                String name = functName.toString();
+                ArrayList<String> correctParams = getParamsCorrected(functName.toString(), paramsArray);
+                String joinedParams = "";
+                for(int k = 0; k < correctParams.size(); k++){
+                    joinedParams += correctParams.get(k);
+                    if(k != correctParams.size()-1) joinedParams += ", ";
+                }
+
+                line.append("(" + joinedParams + ")");
+                i = j;
+                functName.setLength(0);
+
+
+            }
+            else{
+                if((currChar >= 'a' && currChar <= 'z') || (currChar >= 'A' && currChar <= 'Z') || (currChar >= '0' && currChar <= '9') ){
+                    functName.append(currChar);
+                    validChar = true;
+                }
+                else if(currChar != ' '){
+                    functName.setLength(0);
+                    validChar = false;
+                }
+
+                line.append(currChar);
+            }
+        }
+
+        return line.toString();
+    }
+
+
+
 
 }
