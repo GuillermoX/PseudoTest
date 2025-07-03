@@ -17,7 +17,7 @@ public class FunctionBlock extends Block {
     private Types type; 
 
     
-    public FunctionBlock(String name, String params, Types type) throws SyntaxException{
+    public FunctionBlock(String name, ArrayList<String>[] params, Types type) throws SyntaxException{
         super();
         this.name = name;
         this.params = new ArrayList<>();
@@ -27,7 +27,7 @@ public class FunctionBlock extends Block {
     }
 
 
-    public FunctionBlock(String name, String params) throws SyntaxException{
+    public FunctionBlock(String name, ArrayList<String>[] params) throws SyntaxException{
         super();
         this.name = name; 
         this.params = new ArrayList<>();
@@ -35,11 +35,23 @@ public class FunctionBlock extends Block {
         this.type = Types.VOID;
     }
 
-    public FunctionBlock(String name){
+
+    public FunctionBlock(String name) throws SyntaxException{
         super();
-        this.name = name;
+        this.name = name; 
+        this.params = null;
         this.type = Types.VOID;
     }
+
+
+    public FunctionBlock(String name, Types type) throws SyntaxException{
+        super();
+        this.name = name;
+        this.params = null;
+        this.type = type;
+        //TODO: TypeError
+    }
+
 
     public String getName(){
         return this.name;
@@ -52,8 +64,10 @@ public class FunctionBlock extends Block {
     public ArrayList<String> getIOParamsNames(){
         ArrayList<String> paramNames = new ArrayList<>();
 
-        for(Param p : this.params){
-            if(p.isIO()) paramNames.add(p.getDeclaration().getVarName(0));
+        if(params != null){
+            for(Param p : this.params){
+                if(p.isIO()) paramNames.add(p.getDeclaration().getVarName(0));
+            }
         }
 
         return paramNames;
@@ -70,13 +84,16 @@ public class FunctionBlock extends Block {
         String ident = super.getLvlIdent(super.getLvl());
         String cType = type.print();
 
+
         String paramStr = "";
-        for(int i = 0; i < this.params.size(); i ++){
-            paramStr += this.params.get(i).getDeclaration().printAsParam(this.params.get(i).isIO());
-            if(i != (this.params.size()-1)) paramStr += ", ";
+        if(params != null){
+
+            for(int i = 0; i < this.params.size(); i ++){
+                paramStr += this.params.get(i).getDeclaration().printAsParam(this.params.get(i).isIO());
+                if(i != (this.params.size()-1)) paramStr += ", ";
+            }
         }
 
-        //TODO: Add the parameters
         code.add(ident + cType + " " + name + "(" + paramStr + ")");
         code.add(ident + "{");
 
@@ -90,29 +107,26 @@ public class FunctionBlock extends Block {
     }
 
 
-    private void parseParams(String paramStr) throws SyntaxException{
+    private void parseParams(ArrayList<String>[] params) throws SyntaxException{
 
-        if(paramStr.compareTo("") != 0){
-
-            String[] paramsArr = paramStr.split(",");
-
-            for(int i = 0; i < paramsArr.length; i++){
                 boolean isInOut = false;
+                for(int i = 0; i < params.length; i++){
+                    if(params[i].get(0).compareTo("var") == 0){
+                        isInOut = true;
+                        params[i].remove(0);
+                    }                    
 
-                paramsArr[i] = paramsArr[i].replaceFirst("^\\s", "");   //Delete first white spaces
-                paramsArr[i] = paramsArr[i].replaceAll("\\s+", " ");    //Delete repeated white spaces
-                String[] tokens = paramsArr[i].split(" ");
-                if(tokens[0].compareToIgnoreCase("var") == 0){      //If it's IO
-                    isInOut = true;
-                    tokens = Arrays.copyOfRange(tokens, 1, tokens.length);
+                    String[] tokensParams = new String[params[i].size()];
+                    int j = 0;
+                    for(String s : params[i]){
+                        tokensParams[j] = s;
+                        j++;
+                    }
+                    DeclarationInstruct dec = DeclarationInstruct.getDeclarationInstruct(tokensParams);   //Get the declaration of the param 
+                    Param param = new Param(dec, isInOut);
+                    this.params.add(param);
                 }
 
-                DeclarationInstruct dec = DeclarationInstruct.getDeclarationInstruct(tokens);   //Get the declaration of the param 
-                Param param = new Param(dec, isInOut);
-                this.params.add(param);
-
-            }
-        }
 
     }
 

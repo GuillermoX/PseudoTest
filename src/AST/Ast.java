@@ -90,7 +90,8 @@ public class Ast {
             if(tokens[0].compareToIgnoreCase("funcio") == 0){
                 tokens[2] = tokens[2].substring(1, tokens[2].length()-1);
                 Types type = Types.getType(tokens[4]);
-                NodeAVL newFunct = new FunctionBlock(tokens[1], tokens[2], type);
+
+                NodeAVL newFunct = new FunctionBlock(tokens[1], functionParamsParser(tokens[2]), type);
                 newNodes.add(newFunct);
                 functions.add((FunctionBlock)newFunct);    //Add the function to the function list of the AST
                 currentFunct = newFunct;
@@ -122,7 +123,7 @@ public class Ast {
             //Void function
             else if(tokens[0].compareToIgnoreCase("accio") == 0){   
                 tokens[2] = tokens[2].substring(1, tokens[2].length()-1);
-                NodeAVL newFunct = new FunctionBlock(tokens[1], tokens[2]);
+                NodeAVL newFunct = new FunctionBlock(tokens[1], functionParamsParser(tokens[2]));
                 newNodes.add(newFunct);
                 functions.add((FunctionBlock)newFunct);    //Add the function to the function list of the AST
                 currentFunct = newFunct;
@@ -160,7 +161,8 @@ public class Ast {
         else if(tokens.length == 1){
             //Main function
             if(tokens[0].compareTo("algorisme") == 0){
-                NodeAVL newFunct = new FunctionBlock("main", "", Types.INT);
+
+                NodeAVL newFunct = new FunctionBlock("main", Types.INT);
                 newNodes.add(newFunct);
                 currentFunct = newFunct;
 
@@ -393,8 +395,10 @@ public class Ast {
         //Add * to all IO parameters
         if((currentFunct instanceof FunctionBlock) && currentFunct != null){
             ArrayList<String> params = ((FunctionBlock)currentFunct).getIOParamsNames();
-            for(String p : params){
-                line = line.replaceAll("\\b" + p + "\\b", "*" + p);
+            if(params != null){
+                for(String p : params){
+                    line = line.replaceAll("\\b" + p + "\\b", "*" + p);
+                }
             }
         }
 
@@ -418,12 +422,14 @@ public class Ast {
         boolean insideParentheses = false;
         int parenthesesLevel = 0;
 
-        char nextChar, c;
-        nextChar = ' ';
+        char nextChar, prevChar, c;
+        nextChar = prevChar = ' ';
 
         for (int i = 0; i < text.length(); i++) {
             c = text.charAt(i);
             if(i < text.length() - 1) nextChar = text.charAt(i+1);
+            if(currentToken.length() > 0 ) prevChar = currentToken.charAt(currentToken.length()-1);
+            else if(tokens.size() > 0 && tokens.getLast().length() > 0) prevChar = tokens.getLast().charAt(tokens.getLast().length()-1);
 
             if (c == '/' && nextChar == '/'){           //Coment line
                 tokens.add(currentToken.toString());
@@ -447,10 +453,27 @@ public class Ast {
                     currentToken.setLength(0);
                 }
             } 
-            else if (isSeparatorChar(c, nextChar, currentToken.toString()) && !insideParentheses){
-                if(c != ' ') currentToken.append(c);
+            //Space separation
+            else if((c == ' ' && (Character.isLetter(nextChar) || Character.isDigit(nextChar)) && isValidChar(prevChar)) && !insideParentheses){
                 tokens.add(currentToken.toString());
                 currentToken.setLength(0);
+            }
+            //Assignation separation            
+            else if(( c == '<') && !insideParentheses){
+                tokens.add(currentToken.toString());
+                currentToken.setLength(0);
+                currentToken.append(c);
+            }
+            else if((c == '-' && prevChar == '<') && !insideParentheses){
+                currentToken.append(c);
+                tokens.add(currentToken.toString());
+                currentToken.setLength(0);
+            }
+            //Declaration or switch case (":")
+            else if(c != ' ' && (c == ':' || prevChar == ':') && !insideParentheses){
+                tokens.add(currentToken.toString());
+                currentToken.setLength(0);
+                currentToken.append(c);
             }
             else{
                 if(c != ' ' || insideParentheses) currentToken.append(c);
@@ -468,16 +491,12 @@ public class Ast {
 
     private static boolean isSeparatorChar(char c, char nextChar, String prevToken){
         char prevChar = ' ';
-        if(prevToken.length() > 0 ) prevChar = prevToken.charAt(prevToken.length()-1);
-        if(c == ' ' && (Character.isLetter(nextChar) || Character.isDigit(nextChar)) && isValidChar(prevChar)) return true;
-        else if(nextChar == ':' || (prevToken.compareTo(":") == 0)) return true;
-        else if(nextChar == '<' || c == '-') return true;
 
         return false;
     }
 
     private static boolean isValidChar(char c){
-        return Character.isLetter(c) || Character.isDigit(c) || c == ']' || c == '-';
+        return Character.isLetter(c) || Character.isDigit(c) || c == ']';
     }
 
     private static int isDeclaration(String[] tokens){
@@ -604,6 +623,19 @@ public class Ast {
         }
 
         return line.toString();
+    }
+
+
+    private static ArrayList<String>[] functionParamsParser(String tokenParam){
+
+        tokenParam = tokenParam.substring(0, tokenParam.length());
+        String[] subtokens = tokenParam.split(",");
+        ArrayList<String>[] tokensParamsList = new ArrayList[subtokens.length];
+        for(int i = 0; i < subtokens.length; i++){
+            tokensParamsList[i] = splitTokens(subtokens[i]);
+        }
+
+        return tokensParamsList;
     }
 
 

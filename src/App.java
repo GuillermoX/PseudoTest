@@ -28,7 +28,7 @@ public class App {
 
             avl.printCode(args[1]);
         }
-        catch(Exception e){
+        catch(UnknownFunctionCallException | SyntaxException | UnknownInstructionException e){
             System.err.println(e + " [Line " + lineCount + "]");
         }
 
