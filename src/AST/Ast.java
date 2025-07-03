@@ -83,6 +83,8 @@ public class Ast {
         int finishedBlocks = 0;
 
 
+        if(tokens[0] == "") return;     //Coment line (no tokens)
+
         if(tokens.length == 5){
             //If it is not conditional it is function
             if(tokens[0].compareToIgnoreCase("funcio") == 0){
@@ -125,6 +127,10 @@ public class Ast {
                 functions.add((FunctionBlock)newFunct);    //Add the function to the function list of the AST
                 currentFunct = newFunct;
             }
+            //Structure type definition
+            else if(tokens[2].compareToIgnoreCase("registre") == 0){
+                newNodes.add(new StructureBlock(tokens[0]));
+            }
             else{
                 correct = false;
             }
@@ -134,26 +140,17 @@ public class Ast {
 
             //Conditional structure
             String cond = replaceFormatExpresion(tokens[1]);
-            cond = cond.substring(1, cond.length()-1);
+            if(cond.length() >= 3){
+                cond = cond.substring(1, cond.length()-1);
+            }
             //Finishing do while block
             if((tokens[0].compareToIgnoreCase("mentre") == 0) && (this.current instanceof DoWhileBlock)){
                 ((DoWhileBlock)current).addCond(cond);      //Add the condition to the block
                 finishedBlocks = 1;                               //If inside of a do-while block finish block
             } 
-            //Structure type definition
-            else if(tokens[1].compareToIgnoreCase("registre") == 0){
-                String structName = tokens[0].replace(":", "");
-                newNodes.add(new StructureBlock(structName));
-            }
             //Switch structure
             else if(tokens[0].compareToIgnoreCase("opcio") == 0){
                 newNodes.add(new SwitchBlock(cond));
-            }
-            //Function Call
-            else if(tokens[1].charAt(0) == '(' && tokens[1].charAt(tokens[1].length()-1) == ')'){
-                String[] params = cond.split(",");
-                ArrayList<String> paramsCorrect = getParamsCorrected(tokens[0], params);
-                newNodes.add(new FunctionCallInstruct(tokens[0], paramsCorrect));
             }
             else{
                 correct = false;
@@ -258,26 +255,41 @@ public class Ast {
                 newNodes.add(new ReturnInstruct(retur));
             }
             //Switch structure case
-            else if((tokens[0].charAt(tokens[0].length()-1) == ':') || (tokens[1].charAt(tokens[1].length()-1) == ':') ){
+            else if((tokens.length >= 2 && tokens[1].compareToIgnoreCase(":") == 0) || (tokens.length >= 3 && tokens[2].compareToIgnoreCase(":") == 0) ){
                 if(current instanceof SwitchBlock || current instanceof SwitchCaseBlock){
+                    boolean defaultCase = false;
                     if(current instanceof SwitchCaseBlock) finishedBlocks = 1;
                     //If default case move all tokens one position to left because "default" in pseudo uses two tokens
                     if((tokens[0].compareToIgnoreCase("altre") == 0) &&
-                       (tokens[1].compareToIgnoreCase("cas:") == 0)){
-                        tokens = Arrays.copyOfRange(tokens, 1, tokens.length);  //get rid of the first token
+                       (tokens[1].compareToIgnoreCase("cas") == 0)){
+                        defaultCase = true;
                         newNodes.add(new SwitchCaseBlock());    //default case block
                     }
                     else{
-                        newNodes.add(new SwitchCaseBlock(tokens[0].substring(0, tokens[0].length()-1)));
+                        newNodes.add(new SwitchCaseBlock(tokens[0]));
                     }
-                    if(tokens.length > 1){ 
-                        String instruct = String.join(" ", Arrays.copyOfRange(tokens, 1, tokens.length));
+                    if((!defaultCase && tokens.length > 2) || (defaultCase && tokens.length > 3)){ 
+                        int index = 2;
+                        if(defaultCase) index = 3;
+                        String instruct = String.join(" ", Arrays.copyOfRange(tokens, index, tokens.length));
                         newInstruct.add(instruct);
                     }
                 }
                 else{   //If case but not in Switch block
                     throw new SyntaxException("missing \"opcio\" structure to create case");
                 }
+            }
+            //Function Call
+            else if((tokens.length >= 2 && tokens[1].charAt(0) == '(' && tokens[1].charAt(tokens[1].length()-1) == ')') ||
+                    (tokens.length >= 1 && tokens[0].contains("(") && (tokens[0].charAt(tokens[0].length()-1) == ')'))){
+                        
+                String cond = "";
+                if(tokens.length >= 2) cond = replaceFormatExpresion(tokens[1]);
+                else if(tokens.length >= 1) cond = replaceFormatExpresion(tokens[0]);
+                cond = cond.substring(1, cond.length()-1);
+                String[] params = cond.split(",");
+                ArrayList<String> paramsCorrect = getParamsCorrected(tokens[0], params);
+                newNodes.add(new FunctionCallInstruct(tokens[0], paramsCorrect));
             }
             else{
                 correct = false;
@@ -346,6 +358,24 @@ public class Ast {
         catch(IOException e){return -1;}
     }
 
+    /*private static void checkComments(String[] tokens){
+    
+        boolean found = false;
+
+        int i = 0;
+        while(!found && i < tokens.length){
+
+            found = tokens[i].contains("//");
+            i++;
+        }
+
+        if(found){
+            tokens = Arrays.copyOfRange(tokens, 0, i-1);
+        }
+
+    }*/
+
+
     private String replaceFormatExpresion(String line) throws UnknownFunctionCallException, SyntaxException{
 
         line = line.replace(" i ", " && ");
@@ -388,10 +418,23 @@ public class Ast {
         boolean insideParentheses = false;
         int parenthesesLevel = 0;
 
-        for (int i = 0; i < text.length(); i++) {
-            char c = text.charAt(i);
+        char nextChar, c;
+        nextChar = ' ';
 
+        for (int i = 0; i < text.length(); i++) {
+            c = text.charAt(i);
+            if(i < text.length() - 1) nextChar = text.charAt(i+1);
+
+            if (c == '/' && nextChar == '/'){           //Coment line
+                tokens.add(currentToken.toString());
+                return tokens;
+            }
             if (c == '(') {
+
+                if (currentToken.length() > 0 && !insideParentheses) {
+                    tokens.add(currentToken.toString());
+                    currentToken.setLength(0);
+                }
                 if (parenthesesLevel >= 0) currentToken.append(c);
                 parenthesesLevel++;
                 insideParentheses = true;
@@ -403,14 +446,16 @@ public class Ast {
                     tokens.add(currentToken.toString());
                     currentToken.setLength(0);
                 }
-            } else if (Character.isWhitespace(c) && !insideParentheses) {
-                if (currentToken.length() > 0) {
-                    tokens.add(currentToken.toString());
-                    currentToken.setLength(0);
-                }
-            } else {
-                currentToken.append(c);
+            } 
+            else if (isSeparatorChar(c, nextChar, currentToken.toString()) && !insideParentheses){
+                if(c != ' ') currentToken.append(c);
+                tokens.add(currentToken.toString());
+                currentToken.setLength(0);
             }
+            else{
+                if(c != ' ' || insideParentheses) currentToken.append(c);
+            }
+
         }
 
         // Add the last token if any
@@ -419,6 +464,20 @@ public class Ast {
         }
 
         return tokens;
+    }
+
+    private static boolean isSeparatorChar(char c, char nextChar, String prevToken){
+        char prevChar = ' ';
+        if(prevToken.length() > 0 ) prevChar = prevToken.charAt(prevToken.length()-1);
+        if(c == ' ' && (Character.isLetter(nextChar) || Character.isDigit(nextChar)) && isValidChar(prevChar)) return true;
+        else if(nextChar == ':' || (prevToken.compareTo(":") == 0)) return true;
+        else if(nextChar == '<' || c == '-') return true;
+
+        return false;
+    }
+
+    private static boolean isValidChar(char c){
+        return Character.isLetter(c) || Character.isDigit(c) || c == ']' || c == '-';
     }
 
     private static int isDeclaration(String[] tokens){
