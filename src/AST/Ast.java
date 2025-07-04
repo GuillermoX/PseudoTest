@@ -6,7 +6,13 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.io.BufferedWriter;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.Queue;
+
+import javax.sql.rowset.spi.SyncFactoryException;
 
 import AST.Enums.Types;
 import AST.exceptions.*;
@@ -360,22 +366,99 @@ public class Ast {
         catch(IOException e){return -1;}
     }
 
-    /*private static void checkComments(String[] tokens){
-    
-        boolean found = false;
 
-        int i = 0;
-        while(!found && i < tokens.length){
+    public String printCodeString(){
 
-            found = tokens[i].contains("//");
-            i++;
+        String sw = "";
+
+        ArrayList<String> code = new ArrayList<>();
+        
+        sw = "#include <stdbool.h>\n";
+
+        root.printNode(code);
+
+        for(String s : code){ 
+            sw += s + "\n";
         }
 
-        if(found){
-            tokens = Arrays.copyOfRange(tokens, 0, i-1);
+        return sw;
+
+        
+    }
+
+
+
+    public void loadCodeFromFile(String path) throws UnknownFunctionCallException, UnknownInstructionException, SyntaxException, IOException{
+
+        BufferedReader fr = new BufferedReader(new FileReader(path));
+
+        int lineCount = 1;
+
+        try{
+
+            String nextLine = fr.readLine();
+
+            while(nextLine != null){
+                nextLine = nextLine.trim();
+                if(nextLine.compareTo("") != 0){
+                    this.addCode(nextLine);
+                }
+                nextLine = fr.readLine();
+                lineCount ++;
+            }
+
+
+        }
+        catch(UnknownFunctionCallException e){
+            throw new UnknownFunctionCallException(e + "[Line " + lineCount + "]");
+        }
+        catch(UnknownInstructionException e){
+            throw new UnknownInstructionException(e + "[Line " + lineCount + "]");
+        }
+        catch(SyntaxException e){
+            throw new SyntaxException(e + "[Line " + lineCount + "]");
+        }
+        finally{
+            fr.close();
+        }
+            
+
+    }
+
+
+    public void loadCode(String code) throws UnknownFunctionCallException, UnknownInstructionException, SyntaxException, IOException{
+        BufferedReader br = new BufferedReader(new StringReader(code));
+
+        int lineCount = 1;
+
+        try{
+
+            String nextLine = br.readLine();
+
+            while(nextLine != null){
+                nextLine = nextLine.trim();
+                if(nextLine.compareTo("") != 0){
+                    this.addCode(nextLine);
+                }
+                nextLine = br.readLine();
+                lineCount ++;
+            }
+
+
+        }
+        catch(UnknownFunctionCallException e){
+            throw new UnknownFunctionCallException(e + "[Line " + lineCount + "]");
+        }
+        catch(UnknownInstructionException e){
+            throw new UnknownInstructionException(e + "[Line " + lineCount + "]");
+        }
+        catch(SyntaxException e){
+            throw new SyntaxException(e + "[Line " + lineCount + "]");
         }
 
-    }*/
+    }
+
+
 
 
     private String replaceFormatExpresion(String line) throws UnknownFunctionCallException, SyntaxException{
