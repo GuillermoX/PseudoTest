@@ -1,5 +1,5 @@
 
-import AST.*;
+import AST.Ast;
 
 /**
  *
@@ -43,109 +43,130 @@ public class Menu extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     private void initComponents() {
-
-        jPanel3 = new javax.swing.JPanel();
+                jPanel3 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
-        jSplitPane1 = new javax.swing.JSplitPane();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        pseudoTextArea = new javax.swing.JTextArea();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        codeTextArea = new javax.swing.JTextArea();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTextArea3 = new javax.swing.JTextArea();
         TranslateButton = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        codeTextArea = new javax.swing.JTextArea();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        pseudoTextArea = new javax.swing.JTextArea();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(1200, 750));
         setResizable(false);
         setSize(new java.awt.Dimension(1200, 750));
 
-        jPanel3.setBackground(new java.awt.Color(216, 216, 216));
+        jPanel3.setBackground(new java.awt.Color(0, 0, 0));
         jPanel3.setToolTipText("");
+        jPanel3.setMinimumSize(new java.awt.Dimension(1200, 750));
         jPanel3.setPreferredSize(new java.awt.Dimension(1200, 750));
 
-        jPanel1.setBackground(new java.awt.Color(227, 227, 227));
+        jPanel1.setBackground(new java.awt.Color(30, 30, 30));
 
-        jSplitPane1.setDividerLocation(550);
-        jSplitPane1.setDividerSize(20);
-        jSplitPane1.setOpaque(false);
+        jScrollPane3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(65, 65, 65)));
 
-        pseudoTextArea.setColumns(20);
-        pseudoTextArea.setRows(5);
-        jScrollPane1.setViewportView(pseudoTextArea);
-
-        jSplitPane1.setLeftComponent(jScrollPane1);
-
-        codeTextArea.setEditable(false);
-        codeTextArea.setBackground(new java.awt.Color(255, 255, 255));
-        codeTextArea.setColumns(20);
-        codeTextArea.setRows(5);
-        codeTextArea.setDisabledTextColor(new java.awt.Color(102, 102, 102));
-        jScrollPane2.setViewportView(codeTextArea);
-
-        jSplitPane1.setRightComponent(jScrollPane2);
-
+        jTextArea3.setBackground(new java.awt.Color(50, 50, 50));
         jTextArea3.setColumns(20);
+        jTextArea3.setFont(new java.awt.Font("DialogInput", 0, 16)); // NOI18N
+        jTextArea3.setForeground(new java.awt.Color(255, 255, 255));
         jTextArea3.setRows(5);
+        jTextArea3.setBorder(javax.swing.BorderFactory.createCompoundBorder(null, javax.swing.BorderFactory.createEmptyBorder(1, 10, 1, 1)));
         jScrollPane3.setViewportView(jTextArea3);
 
+        TranslateButton.setBackground(new java.awt.Color(45, 45, 45));
+        TranslateButton.setForeground(new java.awt.Color(255, 255, 255));
         TranslateButton.setText("Translate");
+        TranslateButton.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(70, 70, 70), 1, true));
+        TranslateButton.setFocusable(false);
+        TranslateButton.setMargin(new java.awt.Insets(2, 20, 2, 14));
         TranslateButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 translateFunct(evt);
             }
         });
 
+        jScrollPane2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(65, 65, 65)));
+
+        codeTextArea.setEditable(false);
+        codeTextArea.setBackground(new java.awt.Color(50, 50, 50));
+        codeTextArea.setColumns(20);
+        codeTextArea.setFont(new java.awt.Font("DialogInput", 0, 18)); // NOI18N
+        codeTextArea.setForeground(new java.awt.Color(255, 255, 255));
+        codeTextArea.setRows(5);
+        codeTextArea.setBorder(javax.swing.BorderFactory.createCompoundBorder(null, javax.swing.BorderFactory.createEmptyBorder(1, 20, 1, 1)));
+        codeTextArea.setCaretColor(new java.awt.Color(255, 255, 255));
+        codeTextArea.setDisabledTextColor(new java.awt.Color(102, 102, 102));
+        jScrollPane2.setViewportView(codeTextArea);
+
+        jScrollPane1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(65, 65, 65)));
+
+        pseudoTextArea.setBackground(new java.awt.Color(50, 50, 50));
+        pseudoTextArea.setColumns(20);
+        pseudoTextArea.setFont(new java.awt.Font("DialogInput", 0, 18)); // NOI18N
+        pseudoTextArea.setForeground(new java.awt.Color(255, 255, 255));
+        pseudoTextArea.setRows(5);
+        pseudoTextArea.setText("// Put your pseudocode here !");
+        pseudoTextArea.setBorder(javax.swing.BorderFactory.createCompoundBorder(null, javax.swing.BorderFactory.createEmptyBorder(1, 20, 1, 1)));
+        pseudoTextArea.setCaretColor(new java.awt.Color(255, 255, 255));
+        pseudoTextArea.setDisabledTextColor(new java.awt.Color(230, 230, 230));
+        pseudoTextArea.setMargin(new java.awt.Insets(5, 50, 5, 15));
+        jScrollPane1.setViewportView(pseudoTextArea);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(29, 29, 29)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1100, Short.MAX_VALUE)
-                    .addComponent(jScrollPane3))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(21, 21, 21)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 1306, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 677, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane2)))
+                .addGap(0, 21, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(544, Short.MAX_VALUE)
-                .addComponent(TranslateButton)
-                .addGap(538, 538, 538))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(TranslateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(598, 598, 598))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(9, Short.MAX_VALUE)
-                .addComponent(TranslateButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 504, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(24, 24, 24))
+                .addContainerGap()
+                .addComponent(TranslateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 519, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(39, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(17, 17, 17)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(8, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(16, 16, 16)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(15, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
+        jMenuBar1.setBackground(new java.awt.Color(30, 30, 30));
+        jMenuBar1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(102, 102, 102)));
+
+        jMenu1.setForeground(new java.awt.Color(255, 255, 255));
         jMenu1.setText("File");
         jMenuBar1.add(jMenu1);
 
+        jMenu2.setForeground(new java.awt.Color(255, 255, 255));
         jMenu2.setText("Edit");
         jMenuBar1.add(jMenu2);
 
@@ -155,11 +176,11 @@ public class Menu extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 1348, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 724, Short.MAX_VALUE)
+            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -174,7 +195,7 @@ public class Menu extends javax.swing.JFrame {
             this.codeTextArea.setText(outCode);
         }
         catch(Exception e){
-            this.jTextArea3.append(e.toString());
+            this.jTextArea3.append(e.getMessage() + "\n");
         }
 
     }                               

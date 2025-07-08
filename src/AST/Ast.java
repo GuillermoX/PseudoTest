@@ -410,13 +410,13 @@ public class Ast {
 
         }
         catch(UnknownFunctionCallException e){
-            throw new UnknownFunctionCallException(e + "[Line " + lineCount + "]");
+            throw new UnknownFunctionCallException(e.getMessage() + "[Line " + lineCount + "]");
         }
         catch(UnknownInstructionException e){
-            throw new UnknownInstructionException(e + "[Line " + lineCount + "]");
+            throw new UnknownInstructionException(e.getMessage() + "[Line " + lineCount + "]");
         }
         catch(SyntaxException e){
-            throw new SyntaxException(e + "[Line " + lineCount + "]");
+            throw new SyntaxException(e.getMessage() + "[Line " + lineCount + "]");
         }
         finally{
             fr.close();
@@ -447,13 +447,13 @@ public class Ast {
 
         }
         catch(UnknownFunctionCallException e){
-            throw new UnknownFunctionCallException(e + "[Line " + lineCount + "]");
+            throw new UnknownFunctionCallException("Unknown function call: " + e.getMessage() + " [Line " + lineCount + "]");
         }
         catch(UnknownInstructionException e){
-            throw new UnknownInstructionException(e + "[Line " + lineCount + "]");
+            throw new UnknownInstructionException("Unknown instruction: " + e.getMessage() + " [Line " + lineCount + "]");
         }
         catch(SyntaxException e){
-            throw new SyntaxException(e + "[Line " + lineCount + "]");
+            throw new SyntaxException("Syntax error: " + e.getMessage() + " [Line " + lineCount + "]");
         }
 
     }
