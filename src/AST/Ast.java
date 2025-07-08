@@ -34,13 +34,7 @@ public class Ast {
     private ArrayList<FunctionBlock> functions;
 
     public Ast(){
-        root = new Block();
-        root.setLvl(-1);
-        current = root;
-        ConstantDefBlock constBlock = new ConstantDefBlock();
-        ((Block)current).addBodyPart(constBlock);
-        cnst = constBlock;
-        functions = new ArrayList<>();
+        initializeAst();
     }
 
     public boolean addCode(String codeLine) throws UnknownInstructionException, SyntaxException, UnknownFunctionCallException{
@@ -332,6 +326,18 @@ public class Ast {
 
     }
 
+
+    public void initializeAst(){
+
+        root = new Block();
+        root.setLvl(-1);
+        current = root;
+        ConstantDefBlock constBlock = new ConstantDefBlock();
+        ((Block)current).addBodyPart(constBlock);
+        cnst = constBlock;
+        functions = new ArrayList<>();
+    }
+
     public void printCode(){
         ArrayList<String> code = new ArrayList<>();
 
@@ -390,6 +396,9 @@ public class Ast {
 
     public void loadCodeFromFile(String path) throws UnknownFunctionCallException, UnknownInstructionException, SyntaxException, IOException{
 
+
+        this.initializeAst();
+
         BufferedReader fr = new BufferedReader(new FileReader(path));
 
         int lineCount = 1;
@@ -427,6 +436,8 @@ public class Ast {
 
 
     public void loadCode(String code) throws UnknownFunctionCallException, UnknownInstructionException, SyntaxException, IOException{
+        this.initializeAst();
+
         BufferedReader br = new BufferedReader(new StringReader(code));
 
         int lineCount = 1;

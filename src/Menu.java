@@ -1,3 +1,11 @@
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import javax.swing.*;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
 import AST.Ast;
 
@@ -14,6 +22,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JTextArea codeTextArea;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
@@ -54,6 +63,7 @@ public class Menu extends javax.swing.JFrame {
         pseudoTextArea = new javax.swing.JTextArea();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -65,13 +75,13 @@ public class Menu extends javax.swing.JFrame {
         jPanel3.setMinimumSize(new java.awt.Dimension(1200, 750));
         jPanel3.setPreferredSize(new java.awt.Dimension(1200, 750));
 
-        jPanel1.setBackground(new java.awt.Color(30, 30, 30));
+        jPanel1.setBackground(new java.awt.Color(24, 24, 24));
 
         jScrollPane3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(65, 65, 65)));
 
-        jTextArea3.setBackground(new java.awt.Color(50, 50, 50));
+        jTextArea3.setBackground(new java.awt.Color(41, 41, 41));
         jTextArea3.setColumns(20);
-        jTextArea3.setFont(new java.awt.Font("DialogInput", 0, 16)); // NOI18N
+        jTextArea3.setFont(new java.awt.Font("DialogInput", 0, 15)); // NOI18N
         jTextArea3.setForeground(new java.awt.Color(255, 255, 255));
         jTextArea3.setRows(5);
         jTextArea3.setBorder(javax.swing.BorderFactory.createCompoundBorder(null, javax.swing.BorderFactory.createEmptyBorder(1, 10, 1, 1)));
@@ -92,9 +102,9 @@ public class Menu extends javax.swing.JFrame {
         jScrollPane2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(65, 65, 65)));
 
         codeTextArea.setEditable(false);
-        codeTextArea.setBackground(new java.awt.Color(50, 50, 50));
+        codeTextArea.setBackground(new java.awt.Color(41, 41, 41));
         codeTextArea.setColumns(20);
-        codeTextArea.setFont(new java.awt.Font("DialogInput", 0, 18)); // NOI18N
+        codeTextArea.setFont(new java.awt.Font("DialogInput", 0, 15)); // NOI18N
         codeTextArea.setForeground(new java.awt.Color(255, 255, 255));
         codeTextArea.setRows(5);
         codeTextArea.setBorder(javax.swing.BorderFactory.createCompoundBorder(null, javax.swing.BorderFactory.createEmptyBorder(1, 20, 1, 1)));
@@ -104,9 +114,9 @@ public class Menu extends javax.swing.JFrame {
 
         jScrollPane1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(65, 65, 65)));
 
-        pseudoTextArea.setBackground(new java.awt.Color(50, 50, 50));
+        pseudoTextArea.setBackground(new java.awt.Color(41, 41, 41));
         pseudoTextArea.setColumns(20);
-        pseudoTextArea.setFont(new java.awt.Font("DialogInput", 0, 18)); // NOI18N
+        pseudoTextArea.setFont(new java.awt.Font("DialogInput", 0, 15)); // NOI18N
         pseudoTextArea.setForeground(new java.awt.Color(255, 255, 255));
         pseudoTextArea.setRows(5);
         pseudoTextArea.setText("// Put your pseudocode here !");
@@ -122,17 +132,17 @@ public class Menu extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(21, 21, 21)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 1306, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 677, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 799, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane2)))
-                .addGap(0, 21, Short.MAX_VALUE))
+                        .addComponent(jScrollPane2))
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 1508, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 27, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(TranslateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(598, 598, 598))
+                .addGap(686, 686, 686))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -140,12 +150,12 @@ public class Menu extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(TranslateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 519, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 632, Short.MAX_VALUE)
                     .addComponent(jScrollPane2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(39, Short.MAX_VALUE))
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(27, 27, 27))
         );
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
@@ -164,10 +174,22 @@ public class Menu extends javax.swing.JFrame {
 
         jMenu1.setForeground(new java.awt.Color(255, 255, 255));
         jMenu1.setText("File");
+
+        jMenuItem1.setBackground(new java.awt.Color(30, 30, 30));
+        jMenuItem1.setForeground(new java.awt.Color(255, 255, 255));
+        jMenuItem1.setText("Import File");
+        jMenuItem1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                importFile(evt);
+            }
+        });
+        jMenu1.add(jMenuItem1);
+
         jMenuBar1.add(jMenu1);
 
         jMenu2.setForeground(new java.awt.Color(255, 255, 255));
-        jMenu2.setText("Edit");
+        jMenu2.setText("Help");
         jMenuBar1.add(jMenu2);
 
         setJMenuBar(jMenuBar1);
@@ -176,11 +198,15 @@ public class Menu extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 1348, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 1556, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 807, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         pack();
@@ -195,8 +221,45 @@ public class Menu extends javax.swing.JFrame {
             this.codeTextArea.setText(outCode);
         }
         catch(Exception e){
-            this.jTextArea3.append(e.getMessage() + "\n");
+            this.jTextArea3.append(getCurrentTime() + " " + e.getMessage() + "\n");
         }
 
-    }                               
+    }                
+    
+    private void importFile(java.awt.event.ActionEvent evt) {                            
+        JFileChooser fileChooser = new JFileChooser();
+
+        // Mostrar el diálogo de selección
+        int result = fileChooser.showOpenDialog(null);
+
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectFile = fileChooser.getSelectedFile();
+            try{
+                String code = getStringFromFile(selectFile.getAbsolutePath());
+                this.pseudoTextArea.setText(code);
+            }
+            catch(IOException e){
+                this.jTextArea3.append( getCurrentTime() + " Unable to open file: " + selectFile.getAbsolutePath());
+            }
+
+        }    
+    } 
+
+    private static String getStringFromFile(String filePath) throws IOException{
+        BufferedReader bf = new BufferedReader(new FileReader(filePath));
+        String code = "";
+
+        String line = bf.readLine();
+        while( line != null){
+            code += line + "\n";
+            line = bf.readLine();
+        }
+
+        return code;
+    }
+
+    private static String getCurrentTime(){
+        return "(" + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")) + ")";
+    }
+    
 }

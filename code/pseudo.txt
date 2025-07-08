@@ -1,0 +1,150 @@
+tipus
+    tipus_prueba_t:registre
+        nom : taula [ 10]  caracter
+        numero: real
+        l:booleà
+    fregistre
+ftipus
+
+
+//Funció de prova
+funcio boolProva(param1: enter, var param2: real) retorna boolea        //Prova de comentari
+
+    const
+        C <- 2
+        CONST_FLOAT <- 3.3
+        CONST_CHAR <- 'a'
+    fconst
+    
+    retorna 2 + boolProva (1, param1)    
+ffuncio
+
+funcio pruebaFunc2(param1:enter,var param2:enter)retorna enter
+    boolProva(2, param2)
+    param1 <- param1 + 1
+    retorna param1
+ffuncio
+
+funcio pruebaFunc (var param1: enter, var param2: real, var param3: booleà) retorna booleà
+
+
+    const
+        C <- 2
+    fconst
+
+    var
+        a, b : enter
+        x: caracter
+        d : boolea
+        f, g: taula [20] de reals
+        k, j: taula [20][10] d'enters
+        j: tipus_prueba_t
+    fvar
+
+    inici
+
+
+    param2 <- param2 + 2
+    param2 <- pruebaFunc2(43, param2)
+
+    si (boolProva(a, f[0])) llavors
+        b <- 1
+    fsi
+
+    d <- no k i no(k = 2) o (no(no(  k=9)))
+    fer
+        a <- param2 div 2 
+        si (param2 = param1) llavors
+            param2 <- 9
+        fsi
+
+        b <- param1 + 3
+    mentre (param1 > param2 + 9)
+
+    d <- cert
+    d <- fals i a > 3
+
+    si (f[2] > 1) llavors
+        x <- 'c'
+    fsi 
+
+    retorna b = 1
+ffuncio
+
+accio pruebaAccio (param1: enter, var param4: enter)
+
+    var
+        x, m: enter
+        k: booleà
+        param2: enter
+    fvar
+
+    mentre (param2 < param4) fer
+        param2 <- param2 + 1
+    fmentre
+
+    inici
+    opcio (x)
+        1:  si (x > m) llavors
+                x <- 3
+            fsi
+            x <- 2
+            m <- 9
+            si (!(m + 2) = 3) llavors
+                x <- 9
+            fsi
+        43:
+            m <- 45
+    fopcio
+
+    pruebaFunc(param4, m, k)
+
+    si ((no k) i no(k = 2) o (no(no(  k=9)))) llavors
+        
+        x <- 2
+    sino
+        x <- 3
+    fsi 
+
+faccio
+
+
+algorisme
+
+    const
+        CONST_FLOAT <- 3.3
+        CONST_CHAR <- 'a'
+    fconst
+
+    var
+        a, k, p, b, x: enter
+        e: booleà
+    fvar
+
+    inici
+    mentre ((a = 3 i b = 4) o no(x = b)) fer
+        a <- 34
+        e <- (no k) i no(k = 2) o (no(no(  k=9)))
+        a <- 34
+        k <- 34
+    fmentre
+
+    pruebaAccio (a, k)
+
+    p <- 90
+
+    si (no(pruebaFunc(x, k, a))) llavors
+        a <- 43 + 32
+    sino
+        a <- 80
+    fsi
+
+    opcio (a)
+        3455: a <- 9
+        23: b <- 90
+        altre cas: x <- 78
+            k <- ((x + 2)*89)/a
+    fopcio
+falgorisme
+
+       
