@@ -1,0 +1,18 @@
+// Put your PseudoCode here !
+algorisme
+    //Declaració variables
+    var     
+        a: enter
+    fvar
+
+    inici     //Algorisme
+    mentre (a < 10) fer
+        a <- a + 1
+    fmentre
+
+falgorisme
+
+
+
+// Thanks for using PseudoTest :)
+// - CodeURV Team

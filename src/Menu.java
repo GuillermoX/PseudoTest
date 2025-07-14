@@ -3,8 +3,11 @@ import java.time.format.DateTimeFormatter;
 import javax.swing.*;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IO;
 import java.io.IOException;
 
 import AST.Ast;
@@ -23,6 +26,8 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
@@ -34,6 +39,10 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JTextArea pseudoTextArea;
     // End of variables declaration                   
 
+
+    //Logic variables
+    String lastPseudoSaved;
+
     Ast ast;
 
     /**
@@ -42,6 +51,7 @@ public class Menu extends javax.swing.JFrame {
     public Menu(Ast ast) {
         this.ast = ast;
         initComponents();
+        initLogic();
     }
 
     /**
@@ -64,11 +74,19 @@ public class Menu extends javax.swing.JFrame {
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem3 = new javax.swing.JMenuItem();
+        jMenuItem4 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        setTitle("PseudoTest");
         setResizable(false);
         setSize(new java.awt.Dimension(1200, 750));
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                closeWindow(evt);
+            }
+        });
 
         jPanel3.setBackground(new java.awt.Color(0, 0, 0));
         jPanel3.setToolTipText("");
@@ -177,7 +195,7 @@ public class Menu extends javax.swing.JFrame {
 
         jMenuItem1.setBackground(new java.awt.Color(30, 30, 30));
         jMenuItem1.setForeground(new java.awt.Color(255, 255, 255));
-        jMenuItem1.setText("Import File");
+        jMenuItem1.setText("Import PseudoCode");
         jMenuItem1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -185,6 +203,28 @@ public class Menu extends javax.swing.JFrame {
             }
         });
         jMenu1.add(jMenuItem1);
+
+        jMenuItem3.setBackground(new java.awt.Color(30, 30, 30));
+        jMenuItem3.setForeground(new java.awt.Color(255, 255, 255));
+        jMenuItem3.setText("Save PseudoCode as");
+        jMenuItem3.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                savePseudoInFile(evt);
+            }
+        });
+        jMenu1.add(jMenuItem3);
+
+        jMenuItem4.setBackground(new java.awt.Color(30, 30, 30));
+        jMenuItem4.setForeground(new java.awt.Color(255, 255, 255));
+        jMenuItem4.setText("Save C code as");
+        jMenuItem4.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveCodeInFile(evt);
+            }
+        });
+        jMenu1.add(jMenuItem4);
 
         jMenuBar1.add(jMenu1);
 
@@ -210,7 +250,19 @@ public class Menu extends javax.swing.JFrame {
         );
 
         pack();
-    }// </editor-fold>                        
+    }// </editor-fold>                 
+    
+    
+    private void initLogic(){
+        try{
+            this.pseudoTextArea.setText(getStringFromFile("./code/initPseudo.pseudo"));
+        }
+        catch(IOException e){
+            pseudoTextArea.setText("// Put your pseudocode here !");
+        }
+
+        lastPseudoSaved = this.pseudoTextArea.getText();
+    }
 
     private void translateFunct(java.awt.event.ActionEvent evt) {                                
         // TODO add your handling code here:
@@ -239,11 +291,87 @@ public class Menu extends javax.swing.JFrame {
                 this.pseudoTextArea.setText(code);
             }
             catch(IOException e){
-                this.jTextArea3.append( getCurrentTime() + " Unable to open file: " + selectFile.getAbsolutePath());
+                this.jTextArea3.append( getCurrentTime() + " Unable to open file: " + selectFile.getAbsolutePath() + "\n");
             }
 
         }    
     } 
+
+
+
+    private boolean saveInFile(JTextArea textArea){
+        JFileChooser fileChooser = new JFileChooser();
+
+        // Mostrar el diálogo de selección
+        fileChooser.setDialogTitle("Save file as...");
+        int result = fileChooser.showSaveDialog(null);
+
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectFile = fileChooser.getSelectedFile();
+            if(selectFile.exists()){
+                int answer = JOptionPane.showConfirmDialog(null,
+                        "File exists, do you want to override?",
+                        "Yes, I want to override",
+                        JOptionPane.YES_NO_OPTION);
+
+                if (answer != JOptionPane.YES_OPTION) {
+                    this.jTextArea3.append(getCurrentTime() + " Saving file canceled by user \n");
+                    return false;
+                } 
+            }
+            try{
+                String code = textArea.getText();
+                writeStringIntoFile(code, selectFile.getAbsolutePath());
+                this.jTextArea3.append(getCurrentTime() + " Saved file in: " + selectFile.getAbsolutePath() + "\n");
+                return true;
+            }
+            catch(IOException e){
+                this.jTextArea3.append( getCurrentTime() + " Unable to write file: " + selectFile.getAbsolutePath() + "\n");
+                return false;
+            }
+
+        }
+        else{
+            return false;
+        }
+    }
+
+    private void savePseudoInFile(java.awt.event.ActionEvent evt){
+        if(saveInFile(this.pseudoTextArea)){
+            lastPseudoSaved = this.pseudoTextArea.getText();
+        }
+    }
+
+    private void saveCodeInFile(java.awt.event.ActionEvent evt){
+        saveInFile(this.codeTextArea);
+    }
+
+    private void closeWindow(java.awt.event.WindowEvent evt){
+        if(lastPseudoSaved.compareTo(this.pseudoTextArea.getText()) != 0){
+            int answer = JOptionPane.showConfirmDialog(null,
+                        "Close without saving?",
+                        "Close without saving",
+                        JOptionPane.YES_NO_OPTION);
+            if(answer == JOptionPane.YES_OPTION){
+                System.exit(0);
+            }
+            else{
+                return;
+            }
+
+        }
+        else{
+            System.exit(0);
+        }
+    }
+
+    private static void writeStringIntoFile(String code, String path) throws IOException{
+        BufferedWriter br = new BufferedWriter(new FileWriter(path));
+
+        br.write(code);
+
+        br.close();
+    }
 
     private static String getStringFromFile(String filePath) throws IOException{
         BufferedReader bf = new BufferedReader(new FileReader(filePath));
