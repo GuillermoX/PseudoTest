@@ -197,6 +197,7 @@ public class Ast {
                 }
                 else if(((tokens[0].compareToIgnoreCase("fsi") == 0) && (current instanceof IfBlock)) ||
                    ((tokens[0].compareToIgnoreCase("fmentre") == 0) && (current instanceof WhileBlock)) ||
+                   ((tokens[0].compareToIgnoreCase("fper") == 0) && (current instanceof ForBlock)) ||
                    ((tokens[0].compareToIgnoreCase("ffuncio") == 0) && (current instanceof FunctionBlock)) ||
                    ((tokens[0].compareToIgnoreCase("faccio") == 0) && (current instanceof FunctionBlock)) ||
                    ((tokens[0].compareToIgnoreCase("falgorisme") == 0) && (current instanceof FunctionBlock)) ||
@@ -251,6 +252,50 @@ public class Ast {
                     newNode = new AssignationInstruct(tokens[0], assignated);
                 }
                 newNodes.add(newNode);
+            }
+            //For loop 
+            else if((tokens.length >= 5) && tokens[0].compareToIgnoreCase("per") == 0){
+                AssignationInstruct assignInst;
+                String max;
+                String incr = "+1";
+
+                int i = 0;
+                boolean found = false;
+                while(!found && i < tokens.length){
+                    found = tokens[i].compareToIgnoreCase("fins") == 0;
+                    i++;
+                }
+                if(!found) throw new SyntaxException("no \"fins\" delimitator in \"per\" loop");
+
+                tokens[0] = replaceFormatExpresion(tokens[0]);
+                String assignated;
+                try{
+
+                    assignated = String.join(" ", Arrays.copyOfRange(tokens, 3, i-1));
+                }
+                catch(IllegalArgumentException e){
+                    throw new SyntaxException("\"for loop\" must have an initial assignation");
+                }
+                assignated = replaceFormatExpresion(assignated);
+                assignInst = new AssignationInstruct(tokens[1], assignated);
+
+                //Search for incrementation specification
+                int j = i;
+                found = false;
+                while(!found && j < tokens.length){
+                    found = tokens[j].contains("pas");
+                    j++;
+                }
+                if(found){ 
+                    tokens[j-1] = tokens[j-1].replaceAll("\\bpas\\b", "");
+                    incr = String.join(" ", Arrays.copyOfRange(tokens, j-1, tokens.length-1));
+                }
+
+                max = String.join(" ", Arrays.copyOfRange(tokens, i, j-1));
+                
+                newNodes.add(new ForBlock(assignInst, max, incr));
+
+
             }
             //Return instruction
             else if(tokens[0].compareToIgnoreCase("retorna") == 0){

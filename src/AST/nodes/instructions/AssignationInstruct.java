@@ -28,5 +28,9 @@ public class AssignationInstruct extends NodeAVL{
     public void printNode(ArrayList<String> code){
        code.add(super.getLvlIdent(super.getLvl()) + assignated + " = " + assignator + ";"); 
     }
+
+    public String toString(){
+       return super.getLvlIdent(super.getLvl()) + assignated + " = " + assignator + ";"; 
+    }
     
 }
