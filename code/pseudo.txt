@@ -7,8 +7,8 @@ tipus
 ftipus
 
 
-//Funció de prova
-funcio boolProva(param1: enter, var param2: real) retorna boolea        //Prova de comentari
+$ Funció de prova
+funcio boolProva(param1: enter, var param2: real) retorna boolea        $ Prova de comentari
 
     const
         C <- 2

@@ -1,0 +1,21 @@
+$ Put your PseudoCode here !
+algorisme
+    $ Declaració variables
+    var     
+	t: taula[10] d'enters
+	m: taula[10][20] d'enters
+        max, n_elems: enter
+	maxf, maxc, nf, nc: enter
+    fvar
+	
+	obtenir_dades_vector(t, max, n_elems)
+	obtenir_dades_senti (t, max, -1)
+	obtenir_dades_matriu (m, maxf, maxc, nf, nc) 
+
+
+falgorisme
+
+
+
+$ Thanks for using PseudoTest :)
+$ - CodeURV Team

@@ -1,0 +1,27 @@
+
+algorisme
+var 
+	fit: arxiu
+	temp, mitjana, suma: real
+	cmpt: enter
+fvar
+	
+fit <- obrir_fitxer_per_llegir(“nom_fitxer.txt”)
+si (no s'obre l’arxiu correctament) llavors
+	escriure("informar de l'error d'obertura")
+sino
+	$ obtenir/accedir primer element
+	llegir_dada_fitxer(fit,temp)
+	suma <- 0 
+	cmpt <- 0
+	mentre (no final_fitxer(fit)) fer
+		suma <- suma + temp
+		cmpt <- cmpt + 1
+		$ obtenir/accedir al següent element
+		llegir_dada_fitxer(fit, temp)
+	fmentre
+	tancar_fitxer(fit)
+	mitjana <- suma / cmpt
+	escriure ("Mitjana: ", mitjana)
+fsi
+falgorisme

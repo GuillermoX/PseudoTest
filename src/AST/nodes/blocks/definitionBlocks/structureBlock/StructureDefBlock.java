@@ -16,11 +16,12 @@ public class StructureDefBlock extends Block{
     public void printNode(ArrayList<String> code){
         String ident = super.getLvlIdent(super.getLvl());
 
-        code.add(ident + "//Structure definition") ;
+        code.add(ident + "/* -- Structure definition -- */") ;
         int max = super.numBodyParts();
         for(int i = 0; i < max; i++){
             super.getBodyPart(i).printNode(code);
         }
+        code.add(ident + "/* --------------------------- */") ;
 
 
     }

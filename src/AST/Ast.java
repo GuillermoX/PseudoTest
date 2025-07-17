@@ -23,6 +23,7 @@ import AST.nodes.blocks.functionBlocks.*;
 import AST.nodes.instructions.*;
 import AST.nodes.blocks.definitionBlocks.*;
 import AST.nodes.blocks.definitionBlocks.structureBlock.*;
+import app.Menu;
 
 public class Ast {
 
@@ -230,6 +231,7 @@ public class Ast {
             //Declaration instruction
             if(DeclarationInstruct.isDeclaration(tokens)){
 
+                if(!(this.current instanceof VarDefBlock || this.current instanceof StructureBlock)) throw new SyntaxException("needed a declaration / struct block to declare variables");
                 DeclarationInstruct decInstr = DeclarationInstruct.getDeclarationInstruct(tokens);
                 newNodes.add(decInstr);
                 
@@ -292,7 +294,12 @@ public class Ast {
                 String[] params = cond.split(",");
                 String functName = tokens[0];
                 ArrayList<String> paramsCorrect = getParamsCorrected(functName, params);
-                if(functName.compareToIgnoreCase("escriure") == 0) functName = "printf";
+
+                //Changed names to functions
+                functName = changeNameFunction(functName);
+                if(functName.compareTo("") == 0) functName = tokens[0];
+                
+
                 newNodes.add(new FunctionCallInstruct(functName, paramsCorrect));
             }
             else{
@@ -375,7 +382,7 @@ public class Ast {
     }
 
 
-    public String printCodeString(){
+    public String printCodeString() throws IOException{
 
         String sw = "";
 
@@ -387,6 +394,20 @@ public class Ast {
 
         for(String s : code){ 
             sw += s + "\n";
+        }
+
+        //Check if auxiliar functions are needed
+        String auxFunct = "";
+        for(FunctionBlock funct : this.functions){
+            if(funct.isDefOnly()){
+                auxFunct += Menu.getStringFromFile("./lib/arrayLib/" + funct.getName() + ".c"); 
+            }
+        }
+
+        if(auxFunct.compareToIgnoreCase("") != 0){
+            sw += "\n\n/* ------ Auxiliar Functions (DO NOT MODIFY) ------ */\n\n";
+            sw += auxFunct;
+            sw += "/* ------------------------------------------------ */";
         }
 
         return sw;
@@ -528,7 +549,7 @@ public class Ast {
             if(currentToken.length() > 0 ) prevChar = currentToken.charAt(currentToken.length()-1);
             else if(tokens.size() > 0 && tokens.getLast().length() > 0) prevChar = tokens.getLast().charAt(tokens.getLast().length()-1);
 
-            if (c == '/' && nextChar == '/'){           //Coment line
+            if (c == '$'){           //Coment line
                 tokens.add(currentToken.toString());
                 return tokens;
             }
@@ -632,7 +653,8 @@ public class Ast {
 
         ArrayList<String> retParams = new ArrayList<>();
 
-        if(functName.compareTo("escriure") == 0){
+        //Write function
+        if(functName.compareToIgnoreCase("escriure") == 0){
             String str = "";
             for(int i = 0; i < params.length; i++){
                 if(params[i].contains("\"")) str += params[i].replace("\"", "");
@@ -645,7 +667,43 @@ public class Ast {
 
             retParams.addFirst("\"" + str + "\"");
         }
-        else{
+        //Read function
+        else if(functName.compareToIgnoreCase("llegir") == 0){
+            if(params.length != 1) throw new SyntaxException("read function can only receive one parameter");
+
+            Types type = getVarType(params[0]);
+            retParams.add("\"" + Types.getFormatSpecifier(type) + "\"");
+            retParams.add("&(" + params[0] + ")");
+        }
+        //Read from file function
+        else if(functName.compareToIgnoreCase("llegir_dada_fitxer") == 0){
+            if(params.length != 2) throw new SyntaxException("read from file function must receive 2 parameters");
+
+            Types type = getVarType(params[1]);
+            retParams.add(params[0]);
+            retParams.add("\"" + Types.getFormatSpecifier(type) + "\"");
+            retParams.add("&(" + params[1] + ")");
+
+        }
+        //Open file to read
+        else if(functName.compareToIgnoreCase("obrir_fitxer_per_escriure") == 0){
+            if(params.length != 1) throw new SyntaxException("open file function can only receive one parameter");
+
+            retParams.add(params[0]);
+            retParams.add("\"w\"");
+        }
+        //Open file to write
+        else if(functName.compareToIgnoreCase("obrir_fitxer_per_llegir") == 0){
+            if(params.length != 1) throw new SyntaxException("open file function can only receive one parameter");
+
+            retParams.add(params[0]);
+            retParams.add("\"r\"");
+        }
+        else if(isUserFunction(functName)){
+
+
+            //Get dimension of table if first param is table
+            addLibFunction(functName);
 
             //Check if function exists
             boolean found = false;
@@ -680,8 +738,108 @@ public class Ast {
             }
 
         }
+        else{
+            for(int i = 0; i < params.length; i++){
+                retParams.add(params[i]);
+            }
+        }
 
         return retParams;
+    }
+
+    private void addLibFunction(String name) throws SyntaxException{
+        FunctionBlock newFunct = null;
+        ArrayList<String>[] params = null;
+        if(name.compareToIgnoreCase("obtenir_dades_vector") == 0){
+            params = new ArrayList[3];
+            params[0] = new ArrayList<String>();
+            params[0].add("dades");
+            params[0].add(":");
+            params[0].add("taula[]");
+            params[0].add("d'enters");
+            params[1] = new ArrayList<String>();
+            params[1].add("max");
+            params[1].add(":");
+            params[1].add("enter");
+            params[2] = new ArrayList<String>();           
+            params[2].add("var");
+            params[2].add("n_elems");
+            params[2].add(":");
+            params[2].add("enter");
+        }
+        else if(name.compareToIgnoreCase("obtenir_dades_senti") == 0){
+            params = new ArrayList[3];
+            params[0] = new ArrayList<String>();
+            params[0].add("dades");
+            params[0].add(":");
+            params[0].add("taula[]");
+            params[0].add("d'enters");
+            params[1] = new ArrayList<String>();
+            params[1].add("max");
+            params[1].add(":");
+            params[1].add("enter");
+            params[2] = new ArrayList<String>();
+            params[2].add("senti");
+            params[2].add(":");
+            params[2].add("enter");
+        }
+        else if(name.compareToIgnoreCase("obtenir_dades_matriu") == 0){
+            params = new ArrayList[5];
+            params[0] = new ArrayList<String>();
+            params[0].add("var");
+            params[0].add("dades");
+            params[0].add(":");
+            params[0].add("enter");
+            params[1] = new ArrayList<String>();
+            params[1].add("maxf");
+            params[1].add(":");
+            params[1].add("enter");
+            params[2] = new ArrayList<String>();
+            params[2].add("maxc");
+            params[2].add(":");
+            params[2].add("enter");
+            params[3] = new ArrayList<String>();
+            params[3].add("var");
+            params[3].add("nf");
+            params[3].add(":");
+            params[3].add("enter");
+            params[4] = new ArrayList<String>();
+            params[4].add("var");
+            params[4].add("nc");
+            params[4].add(":");
+            params[4].add("enter");
+            
+        }
+
+
+        if(params != null){
+            newFunct = new FunctionBlock(name, params);
+            newFunct.setDefOnly(true);
+            this.functions.addFirst(newFunct);
+            ((Block)this.root).getBody().addFirst(newFunct);
+        }
+    }
+
+    private static boolean isUserFunction(String name){
+        return !(name.compareToIgnoreCase("obrir_fitxer_per_llegir") == 0 ||
+                name.compareToIgnoreCase("obrir_fitxer_per_escriure") == 0 ||
+                name.compareToIgnoreCase("obrir_fitxer_llegir") == 0 ||
+                name.compareToIgnoreCase("obrir_fitxer_escriure") == 0 ||
+                name.compareToIgnoreCase("final_fitxer") == 0 ||
+                name.compareToIgnoreCase("tancar_fitxer") == 0);
+    }
+
+    private static String changeNameFunction(String functName){
+        if(functName.compareToIgnoreCase("escriure") == 0) return "printf";
+        else if(functName.compareToIgnoreCase("llegir") == 0) return "scanf";
+        else if(functName.compareToIgnoreCase("final_fitxer") == 0) return "feof";
+        else if(functName.compareToIgnoreCase("tancar_fitxer") == 0) return "fclose";
+        else if(functName.compareToIgnoreCase("obrir_fitxer_per_llegir") == 0 ||
+                        functName.compareToIgnoreCase("obrir_fitxer_per_escriure") == 0 ||
+                        functName.compareToIgnoreCase("obrir_fitxer_llegir") == 0 ||
+                        functName.compareToIgnoreCase("obrir_fitxer_escriure") == 0) return "fopen"; 
+        else if(functName.compareToIgnoreCase("llegir_dada_fitxer") == 0) return "fscanf";
+        else return "";
     }
 
     private Types getVarType(String var) throws SyntaxException{
@@ -706,7 +864,12 @@ public class Ast {
         while((i < definitionBody.size()) && !found){
             NodeAVL node = definitionBody.get(i);
             if(node instanceof DeclarationInstruct){
-                found = ((DeclarationInstruct)node).getVarName(0).compareToIgnoreCase(var) == 0;
+                ArrayList<String> vars = ((DeclarationInstruct)node).getVars();
+                int j = 0;
+                while(j < vars.size() && !found){
+                    found = ((DeclarationInstruct)node).getVarName(j).compareToIgnoreCase(var) == 0;
+                    j++;
+                }
                 type = ((DeclarationInstruct)node).getType();
             }
             i++;
@@ -747,7 +910,6 @@ public class Ast {
                 String[] paramsArray = new String[params.size()];
                 for(int k = 0; k < params.size(); k++) paramsArray[k] = params.get(k);
                 
-                String name = functName.toString();
                 ArrayList<String> correctParams = getParamsCorrected(functName.toString(), paramsArray);
                 String joinedParams = "";
                 for(int k = 0; k < correctParams.size(); k++){
@@ -756,13 +918,23 @@ public class Ast {
                 }
 
                 line.append("(" + joinedParams + ")");
+                
+                String name = changeNameFunction(functName.toString());
+                if(name.compareToIgnoreCase("") != 0){
+                    String test = line.toString();
+                    int start = line.indexOf(functName.toString());
+                    int end = start + functName.toString().length();
+                    line.replace(start, end, name);
+                    test = line.toString();
+                    test = line.toString();
+                }
                 i = j;
                 functName.setLength(0);
 
 
             }
             else{
-                if((currChar >= 'a' && currChar <= 'z') || (currChar >= 'A' && currChar <= 'Z') || (currChar >= '0' && currChar <= '9') ){
+                if((currChar >= 'a' && currChar <= 'z') || (currChar >= 'A' && currChar <= 'Z') || (currChar >= '0' && currChar <= '9')  || currChar == '_'){
                     functName.append(currChar);
                     validChar = true;
                 }

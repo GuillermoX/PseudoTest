@@ -1,3 +1,4 @@
+package app;
 import AST.*;
 
 public class AppGUI { 

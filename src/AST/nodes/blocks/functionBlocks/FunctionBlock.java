@@ -15,6 +15,7 @@ public class FunctionBlock extends Block {
     private String name;
     private ArrayList<Param> params;       //TODO: Use params
     private Types type; 
+    private boolean isDefOnly;
 
     
     public FunctionBlock(String name, ArrayList<String>[] params, Types type) throws SyntaxException{
@@ -73,6 +74,14 @@ public class FunctionBlock extends Block {
         return paramNames;
     }
 
+    public boolean isDefOnly(){
+        return this.isDefOnly;
+    }
+
+
+    public void setDefOnly(boolean set){
+        isDefOnly = set;
+    }
 
 
 
@@ -94,27 +103,35 @@ public class FunctionBlock extends Block {
             }
         }
 
-        code.add(ident + cType + " " + name + "(" + paramStr + ")");
-        code.add(ident + "{");
+        String def = ident + cType + " " + name + "(" + paramStr + ")";
+        if(isDefOnly) def += ";";
+        code.add(def);
 
-        int max = super.numBodyParts();
-        for(int i = 0; i < max; i++){
-            super.getBodyPart(i).printNode(code);
+        if(!isDefOnly){
+            code.add(ident + "{");
+
+            int max = super.numBodyParts();
+            for(int i = 0; i < max; i++){
+                super.getBodyPart(i).printNode(code);
+            }
+
+            code.add(ident + "}");
         }
-
-        code.add(ident + "}");
 
     }
 
 
     private void parseParams(ArrayList<String>[] params) throws SyntaxException{
 
-                boolean isInOut = false;
+                boolean isInOut;
                 for(int i = 0; i < params.length; i++){
                     if(params[i].get(0).compareTo("var") == 0){
                         isInOut = true;
                         params[i].remove(0);
                     }                    
+                    else{
+                        isInOut = false;
+                    }
 
                     String[] tokensParams = new String[params[i].size()];
                     int j = 0;

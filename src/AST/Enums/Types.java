@@ -3,7 +3,7 @@ package AST.Enums;
 import AST.exceptions.SyntaxException;
 
 public enum Types {
-    INT, FLOAT, CHAR, BOOL, VOID, STRUCT;
+    INT, FLOAT, CHAR, BOOL, VOID, STRUCT, FILE;
 
     public String print(){
         if(this == Types.INT) return "int";
@@ -11,6 +11,7 @@ public enum Types {
         else if(this == Types.CHAR) return "char";
         else if(this == Types.BOOL) return "bool";
         else if(this == Types.VOID) return "void";
+        else if(this == Types.FILE) return "FILE*";
         else return "struct";
     }
 
@@ -28,6 +29,7 @@ public enum Types {
         else if(type.compareToIgnoreCase("boolea") == 0 ||
                 type.compareToIgnoreCase("booleans") == 0 ||
                 type.compareToIgnoreCase("booleà") == 0) return Types.BOOL;
+        else if(type.compareToIgnoreCase("arxiu") == 0) return Types.FILE; 
         else return Types.STRUCT;
     }
 
@@ -35,6 +37,6 @@ public enum Types {
         if(type == INT) return "%d";
         else if(type == FLOAT) return "%f";
         else if(type == CHAR) return "%c";
-        else throw new SyntaxException("variable type not allowed to print");
+        else throw new SyntaxException("variable type not allowed");
     }
 }

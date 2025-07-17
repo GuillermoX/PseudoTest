@@ -38,6 +38,10 @@ public class DeclarationInstruct extends NodeAVL {
         }
     }
 
+    public ArrayList<String> getVars(){
+        return this.vars;
+    }
+
     public Types getType(){
         return type;
     }

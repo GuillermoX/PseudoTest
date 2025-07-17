@@ -1,3 +1,4 @@
+package app;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import javax.swing.*;
@@ -300,11 +301,12 @@ public class Menu extends javax.swing.JFrame {
         // Mostrar el diálogo de selección
         int result = fileChooser.showOpenDialog(null);
 
-        if (result == JFileChooser.APPROVE_OPTION) {
+        if (result == JFileChooser.APPROVE_OPTION && sureToClose()) {
             File selectFile = fileChooser.getSelectedFile();
             try{
                 String code = getStringFromFile(selectFile.getAbsolutePath());
                 this.pseudoTextArea.setText(code);
+                this.lastPseudoSaved = code;
             }
             catch(IOException e){
                 this.jTextArea3.append( getCurrentTime() + " Unable to open file: " + selectFile.getAbsolutePath() + "\n");
@@ -381,22 +383,25 @@ public class Menu extends javax.swing.JFrame {
         }
 
     private void closeWindow(java.awt.event.WindowEvent evt){
+        if(sureToClose()) System.exit(0);
+    }
+
+    private boolean sureToClose(){
+
         if(lastPseudoSaved.compareTo(this.pseudoTextArea.getText()) != 0){
             int answer = JOptionPane.showConfirmDialog(null,
                         "Close without saving?",
                         "Close without saving",
                         JOptionPane.YES_NO_OPTION);
             if(answer == JOptionPane.YES_OPTION){
-                System.exit(0);
+                return true;
             }
             else{
-                return;
+                return false;
             }
 
         }
-        else{
-            System.exit(0);
-        }
+        else return true;
     }
 
     private static void writeStringIntoFile(String code, String path) throws IOException{
@@ -407,7 +412,7 @@ public class Menu extends javax.swing.JFrame {
         br.close();
     }
 
-    private static String getStringFromFile(String filePath) throws IOException{
+    public static String getStringFromFile(String filePath) throws IOException{
         BufferedReader bf = new BufferedReader(new FileReader(filePath));
         String code = "";
 
