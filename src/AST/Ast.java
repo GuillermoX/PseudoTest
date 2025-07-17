@@ -290,8 +290,10 @@ public class Ast {
                 else if(tokens.length >= 1) cond = replaceFormatExpresion(tokens[0]);
                 cond = cond.substring(1, cond.length()-1);
                 String[] params = cond.split(",");
-                ArrayList<String> paramsCorrect = getParamsCorrected(tokens[0], params);
-                newNodes.add(new FunctionCallInstruct(tokens[0], paramsCorrect));
+                String functName = tokens[0];
+                ArrayList<String> paramsCorrect = getParamsCorrected(functName, params);
+                if(functName.compareToIgnoreCase("escriure") == 0) functName = "printf";
+                newNodes.add(new FunctionCallInstruct(functName, paramsCorrect));
             }
             else{
                 correct = false;
@@ -478,6 +480,7 @@ public class Ast {
         line = line.replace(" o ", " || ");
         line = line.replace("=", "==");
         line = line.replaceAll("\\bdiv\\b", "/");   //Replace "div" with "/" only when is not in a word
+        line = line.replaceAll("\\bmod\\b", "%");   //Replace "div" with "/" only when is not in a word
         line = line.replaceAll("\\bno\\b", "!");   //Replace "no" with "!" only when is not in a word
         line = line.replace("! ", "!");            //Special case
         line = line.replaceAll("\\bcert\\b", "true");   //Replace "cert" with "true" only when is not in a word
@@ -626,36 +629,92 @@ public class Ast {
 
 
     private ArrayList<String> getParamsCorrected(String functName, String[] params) throws UnknownFunctionCallException, SyntaxException {
-        //Check if function exists
-        boolean found = false;
-        int i = 0;
-        while(!found && (i < this.functions.size())){
-            //Check for every function declared if matches to the current function call
-            found = this.functions.get(i).getName().compareToIgnoreCase(functName) == 0;
-            i++;
-        }
-        if(!found) throw new UnknownFunctionCallException(functName);
-        i --;
-
-        FunctionBlock currentFunct = this.functions.get(i);
-        ArrayList<Param> paramsFunct = currentFunct.getParams();  //Get the function
-
-        //Check for every parameter if needed IO indication (&)
-        i = 0;
-        while(i < params.length && i < paramsFunct.size()){
-            //TODO: Check if variable is also IO param in function
-            if(paramsFunct.get(i).isIO()) params[i] = "&" + "(" + params[i] + ")";
-            i++;
-        }
-        if((i != paramsFunct.size()) || (i != params.length)) throw new SyntaxException("number of parameters not maching the function definition");
-
 
         ArrayList<String> retParams = new ArrayList<>();
-        for(int j = 0; j < params.length; j++){
-            retParams.add(params[j]);
+
+        if(functName.compareTo("escriure") == 0){
+            String str = "";
+            for(int i = 0; i < params.length; i++){
+                if(params[i].contains("\"")) str += params[i].replace("\"", "");
+                else{
+                    Types type = getVarType(params[i]);
+                    str += Types.getFormatSpecifier(type);
+                    retParams.add(params[i]);
+                }
+            }
+
+            retParams.addFirst("\"" + str + "\"");
+        }
+        else{
+
+            //Check if function exists
+            boolean found = false;
+            int i = 0;
+            while(!found && (i < this.functions.size())){
+                //Check for every function declared if matches to the current function call
+                found = this.functions.get(i).getName().compareToIgnoreCase(functName) == 0;
+                i++;
+            }
+            if(!found) throw new UnknownFunctionCallException(functName);
+            i --;
+
+            FunctionBlock currentFunct = this.functions.get(i);
+            ArrayList<Param> paramsFunct = currentFunct.getParams();  //Get the function
+
+            //Check for every parameter if needed IO indication (&)
+            int paramsLenght = params.length;
+            if(params[0].compareToIgnoreCase("") == 0) paramsLenght --;
+            if(paramsLenght != paramsFunct.size()) throw new SyntaxException("number of parameters not maching the function definition");
+            else{
+                i = 0;
+                while(i < params.length && i < paramsFunct.size()){
+                    //TODO: Check if variable is also IO param in function
+                    if(paramsFunct.get(i).isIO()) params[i] = "&" + "(" + params[i] + ")";
+                    i++;
+                }
+            }
+
+
+            for(int j = 0; j < params.length; j++){
+                retParams.add(params[j]);
+            }
+
         }
 
         return retParams;
+    }
+
+    private Types getVarType(String var) throws SyntaxException{
+        Types type = Types.STRUCT;  //Initialize to avoid return error (no impact)
+        var = var.replace(" ", "");
+
+        ArrayList<NodeAVL> functBlocks = ((FunctionBlock)this.currentFunct).getBody();
+        boolean found = false;
+
+        //Find variable def block
+        int i = 0;
+        while((i < functBlocks.size()) && !found){
+            found = functBlocks.get(i) instanceof VarDefBlock;
+            i++;
+        }
+        if(!found) throw new SyntaxException("variable \"" + var + "\" not defined");
+
+        //Find variable
+        ArrayList<NodeAVL> definitionBody = ((Block)functBlocks.get(i-1)).getBody();
+        i = 0;
+        found = false;
+        while((i < definitionBody.size()) && !found){
+            NodeAVL node = definitionBody.get(i);
+            if(node instanceof DeclarationInstruct){
+                found = ((DeclarationInstruct)node).getVarName(0).compareToIgnoreCase(var) == 0;
+                type = ((DeclarationInstruct)node).getType();
+            }
+            i++;
+        }
+        if(!found) throw new SyntaxException("variable \"" + var + "\" not defined");
+
+        return type;
+
     }
 
     private String getInLineFunctionCallCorrected(String codeLine) throws UnknownFunctionCallException, SyntaxException{
@@ -716,7 +775,9 @@ public class Ast {
             }
         }
 
-        return line.toString();
+        String lineStr = line.toString();
+
+        return lineStr;
     }
 
 

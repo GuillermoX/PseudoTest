@@ -1,5 +1,7 @@
 package AST.Enums;
 
+import AST.exceptions.SyntaxException;
+
 public enum Types {
     INT, FLOAT, CHAR, BOOL, VOID, STRUCT;
 
@@ -27,5 +29,12 @@ public enum Types {
                 type.compareToIgnoreCase("booleans") == 0 ||
                 type.compareToIgnoreCase("booleà") == 0) return Types.BOOL;
         else return Types.STRUCT;
+    }
+
+    public static String getFormatSpecifier(Types type) throws SyntaxException{
+        if(type == INT) return "%d";
+        else if(type == FLOAT) return "%f";
+        else if(type == CHAR) return "%c";
+        else throw new SyntaxException("variable type not allowed to print");
     }
 }

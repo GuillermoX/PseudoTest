@@ -9,6 +9,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IO;
 import java.io.IOException;
+import java.awt.Desktop;
+import java.net.URI;
 
 import AST.Ast;
 
@@ -26,6 +28,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuBar jMenuBar1;
@@ -77,6 +80,7 @@ public class Menu extends javax.swing.JFrame {
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenuItem4 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
+        jMenuItem2 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("PseudoTest");
@@ -230,6 +234,18 @@ public class Menu extends javax.swing.JFrame {
 
         jMenu2.setForeground(new java.awt.Color(255, 255, 255));
         jMenu2.setText("Help");
+
+        jMenuItem2.setBackground(new java.awt.Color(30, 30, 30));
+        jMenuItem2.setForeground(new java.awt.Color(255, 255, 255));
+        jMenuItem2.setText("How to Use");
+        jMenuItem2.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                openHelp(evt);
+            }
+        });
+        jMenu2.add(jMenuItem2);
+
         jMenuBar1.add(jMenu2);
 
         setJMenuBar(jMenuBar1);
@@ -345,6 +361,24 @@ public class Menu extends javax.swing.JFrame {
     private void saveCodeInFile(java.awt.event.ActionEvent evt){
         saveInFile(this.codeTextArea);
     }
+
+    private void openHelp(java.awt.event.ActionEvent evt){
+
+            try {
+                Desktop desktop = Desktop.getDesktop();
+
+                // Verifica si la acción de navegar está soportada
+                if (desktop.isSupported(Desktop.Action.BROWSE)) {
+                    URI uri = new URI("https://github.com/GuillermoX/PseudoTest");
+                    desktop.browse(uri);
+                } else {
+                    this.jTextArea3.append(getCurrentTime() + " Browser not supported \n");
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
     private void closeWindow(java.awt.event.WindowEvent evt){
         if(lastPseudoSaved.compareTo(this.pseudoTextArea.getText()) != 0){

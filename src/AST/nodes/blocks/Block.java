@@ -20,6 +20,10 @@ public class Block extends NodeAVL{
         body.add(node);
     }
 
+    public ArrayList<NodeAVL> getBody(){
+        return body;
+    }
+
     public NodeAVL getBodyPart(int i){
         return body.get(i);
     }
