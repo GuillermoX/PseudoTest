@@ -23,7 +23,7 @@ import AST.nodes.blocks.functionBlocks.*;
 import AST.nodes.instructions.*;
 import AST.nodes.blocks.definitionBlocks.*;
 import AST.nodes.blocks.definitionBlocks.structureBlock.*;
-import app.Menu;
+import app.AppGUI;
 
 public class Ast {
 
@@ -445,7 +445,7 @@ public class Ast {
         String auxFunct = "";
         for(FunctionBlock funct : this.functions){
             if(funct.isDefOnly()){
-                auxFunct += Menu.getStringFromFile("./lib/arrayLib/" + funct.getName() + ".c"); 
+                auxFunct += AppGUI.getStringFromFile("./lib/arrayLib/" + funct.getName() + ".c"); 
             }
         }
 
