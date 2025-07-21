@@ -1,9 +1,9 @@
 <h1 align="center" style="display: block; font-size: 2.5em; font-weight: bold; margin-block-start: 1em; margin-block-end: 1em;">
-<a name="logo"><img align="center" src="" alt="" style="width:100%;height:100%"/></a>
+<a name="logo"><img align="center" src="https://github.com/GuillermoX/GuillermoX/blob/main/.github/img/PseudoTest.png" alt="" style="width:15%;height:25%"/></a>
   <br /><br /><strong>PseudoTest</strong>
 </h1>
 
-*PseudoTest - a simple PseudoCode to C translator for URV students.*
+*PseudoTest - a simple PseudoCode to C translator made to help URV students.*
 
 \* This README is written in spanish since most of the users (if not all) are students from Universitat Rovira i Virgili.
 
@@ -89,8 +89,6 @@ Ahora que he acabado el 2o curso me he dado cuenta que una herramienta capaz de 
 > [!CAUTION]
 > Ya está indicado, pero cabe recalcar que no se debe modificar el código de las implementaciones de rutinas auxiliares.
 
----
-
 
 ## Limitaciones ❌
 PseudoTest está lejos de ser una herramienta perfecta, a continuación dejo la lista de limitaciones con las que cuenta.
@@ -145,6 +143,7 @@ PseudoTest está lejos de ser una herramienta perfecta, a continuación dejo la 
     $ Continua el codi
   fsi
   ```
+---
   
 ## Cómo generar el binario 🧑‍💻
 En caso de no querer o no poder ejecutar la versión compilada para cada SO de PseudoTest, tienes la opción de ejecutar el binario .jar que se encuentra en la carpeta ``` input/ ``` del código. Para ello necesitas tener instalado el JRE (Java Runtime Enviroment) que puedes descargar de la web oficial de Java: https://www.java.com/en/download/manual.jsp
@@ -156,7 +155,7 @@ jar cfm PseudoTest.jar Manifest.mf -C out .
 ```
 Esto generará el binario .jar que podrás ejecutar si tienes el JRE instalado.
 
-
+---
 
 ## Muchas gracias 🙏
 
