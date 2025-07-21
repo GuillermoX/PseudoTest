@@ -48,6 +48,8 @@ Ahora que he acabado el 2o curso me he dado cuenta que una herramienta capaz de 
 
 ---
 ## Funcionalidades ✅
+- Escribir, importar, modificar y guardar pseudocódigo a modo de IDE muy simplista.
+- Traducir el pseudocódigo a código C.
 - Uso de toda la sintaxis del pseudocódigo dada en la asignatura (a excepción de la indicada en el apartado de limitaciones).
 - Implementación de las funciones de manipulación de listas y matrices. En la asignatura se dan unas funciones "ya implementadas" para utilizar en los ejercicios. En caso de ser utilizadas en PseudoTest, este añade la implementaciones de estas funciones para que se pueda ejecutar el código en C.
  A continación un ejemplo:
