@@ -1,0 +1,23 @@
+$ Put your PseudoCode here !
+algorisme
+    $ Declaració variables
+    var     
+        a: enter
+    fvar
+
+    escriure("Hello CodeURV")
+
+    inici     $Algorisme
+    mentre (a < 10) fer
+        a <- a + 1
+    fmentre
+
+    per a<-2 fins b pas+2 fer
+    fper
+
+falgorisme
+
+
+
+$ Thanks for using PseudoTest :)
+$ - CodeURV Team
