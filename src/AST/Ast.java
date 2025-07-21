@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Arrays;
 import java.io.BufferedWriter;
 import java.io.BufferedReader;
@@ -11,6 +12,9 @@ import java.io.FileReader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Queue;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.net.URISyntaxException;
 
 import javax.sql.rowset.spi.SyncFactoryException;
 
@@ -24,6 +28,7 @@ import AST.nodes.instructions.*;
 import AST.nodes.blocks.definitionBlocks.*;
 import AST.nodes.blocks.definitionBlocks.structureBlock.*;
 import app.AppGUI;
+import app.PseudoTest;
 
 public class Ast {
 
@@ -84,7 +89,7 @@ public class Ast {
         int finishedBlocks = 0;
 
 
-        if(tokens[0] == "") return;     //Coment line (no tokens)
+        if(tokens[0].compareToIgnoreCase("") == 0) return;     //Coment line (no tokens)
 
         if(tokens.length == 5){
             //If it is not conditional it is function
@@ -427,7 +432,7 @@ public class Ast {
     }
 
 
-    public String printCodeString() throws IOException{
+    public String printCodeString() throws IOException, UnknownFunctionCallException{
 
         String sw = "";
 
@@ -445,7 +450,20 @@ public class Ast {
         String auxFunct = "";
         for(FunctionBlock funct : this.functions){
             if(funct.isDefOnly()){
-                auxFunct += AppGUI.getStringFromFile("./lib/arrayLib/" + funct.getName() + ".c"); 
+                try{
+                    Path initCode = Paths.get(PseudoTest.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+                    String path;
+                    if(initCode.toString().endsWith(".jar")){
+                        path = initCode.getParent().resolve("./code/" + funct.getName() + ".c").toAbsolutePath().toString();
+                    }
+                    else{
+                        path = "./code/" + funct.getName() + ".c";
+                    }
+
+                    auxFunct += AppGUI.getStringFromFile(path); 
+                }
+                catch(URISyntaxException e){ throw new UnknownFunctionCallException("impossible to load array functions");}
+
             }
         }
 
@@ -592,7 +610,7 @@ public class Ast {
             c = text.charAt(i);
             if(i < text.length() - 1) nextChar = text.charAt(i+1);
             if(currentToken.length() > 0 ) prevChar = currentToken.charAt(currentToken.length()-1);
-            else if(tokens.size() > 0 && tokens.getLast().length() > 0) prevChar = tokens.getLast().charAt(tokens.getLast().length()-1);
+            else if(tokens.size() > 0 && tokens.get(tokens.size()-1).length() > 0) prevChar = tokens.get(tokens.size()-1).charAt(tokens.get(tokens.size()-1).length()-1);
 
             if (c == '$'){           //Coment line
                 tokens.add(currentToken.toString());
@@ -710,7 +728,7 @@ public class Ast {
                 }
             }
 
-            retParams.addFirst("\"" + str + "\"");
+            retParams.add(0,"\"" + str + "\"");
         }
         //Read function
         else if(functName.compareToIgnoreCase("llegir") == 0){
@@ -860,8 +878,8 @@ public class Ast {
         if(params != null){
             newFunct = new FunctionBlock(name, params);
             newFunct.setDefOnly(true);
-            this.functions.addFirst(newFunct);
-            ((Block)this.root).getBody().addFirst(newFunct);
+            this.functions.add(0,newFunct);
+            ((Block)this.root).getBody().add(0,newFunct);
         }
     }
 

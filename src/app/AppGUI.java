@@ -8,17 +8,18 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IO;
 import java.io.IOException;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.net.URI;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 import java.awt.Dimension;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.net.URISyntaxException;
 
 import AST.Ast;
-
-import lib.GUI.TextLineNumber;
+import GUI.TextLineNumber;
 
 /**
  *
@@ -312,10 +313,22 @@ public class AppGUI extends javax.swing.JFrame {
     
     private void initLogic(){
         try{
-            this.pseudoTextArea.setText(getStringFromFile("./code/initPseudo.pseudo"));
+            Path initCode = Paths.get(PseudoTest.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            String path;
+            if(initCode.toString().endsWith(".jar")){
+                path = initCode.getParent().resolve("./code/initPseudo.pseudo").toAbsolutePath().toString();
+            }
+            else{
+                path = "./code/initPseudo.pseudo";
+            }
+            this.pseudoTextArea.setText(getStringFromFile(path));
         }
         catch(IOException e){
-            pseudoTextArea.setText("// Put your pseudocode here !");
+            pseudoTextArea.setText("$ Put your pseudocode here !");
+        }
+        catch(URISyntaxException e){
+
+            pseudoTextArea.setText("$ Put your pseudocode here !");
         }
 
         lastPseudoSaved = this.pseudoTextArea.getText();
