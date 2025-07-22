@@ -95,6 +95,13 @@ Ahora que he acabado el 2o curso me he dado cuenta que una herramienta capaz de 
 > [!CAUTION]
 > Ya está indicado, pero cabe recalcar que no se debe modificar el código de las implementaciones de rutinas auxiliares.
 
+  ### Atajos de teclado
+  | Atajo | Acción |
+  |-------|--------|
+  | Ctrl + Z | Deshacer cambios |
+  | Ctrl + Y | Rehacer cambios |
+  | Ctrl + S | Guardar Pseudocódigo |
+
 
 ## Limitaciones ❌
 PseudoTest está lejos de ser una herramienta perfecta, a continuación dejo la lista de limitaciones con las que cuenta.
