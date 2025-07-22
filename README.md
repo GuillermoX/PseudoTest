@@ -11,11 +11,11 @@
 <!-- markdownlint-disable -->
 
 ## Descargar ejecutable ⬇️
-
+Escoje el archivo ZIP correspondiente a tu sistema.
 | Plataforma  | Última versión   |
 |-----------|---------------|
-| Windows   | [beta.1-v.1.0.0](https://github.com/GuillermoX/PseudoTest/releases/tag/windows) |
-| Linux     | [beta.1-v.1.0.0](https://github.com/GuillermoX/PseudoTest/releases/tag/linux)|
+| Windows   | [beta.1-v.1.1.0](https://github.com/GuillermoX/PseudoTest/releases/tag/v1.1.0-beta.1) |
+| Linux     | [beta.1-v.1.1.0](https://github.com/GuillermoX/PseudoTest/releases/tag/v1.1.0-beta.1)|
 
 > [!NOTE]
 > La versión para Mac estará disponible pronto.
