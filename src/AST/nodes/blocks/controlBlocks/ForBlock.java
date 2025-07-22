@@ -23,7 +23,7 @@ public class ForBlock extends Block{
         String ident = super.getLvlIdent(super.getLvl());
 
         String assig = assignment.getAssignated();
-        code.add(ident + "for " + "(" + assignment.toString() + " " + assig + " <= " + max + "; " + assig + incr + ")");
+        code.add(ident + "for " + "(" + assignment.toString() + " " + assig + " <= " + max + "; " + assig + " = " + assig + incr + ")");
         code.add(ident + "{");
 
         int max = super.numBodyParts();
