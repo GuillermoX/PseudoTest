@@ -183,7 +183,7 @@ public class AppGUI extends javax.swing.JFrame {
         pseudoTextArea.setFont(new java.awt.Font("DialogInput", 0, 15)); // NOI18N
         pseudoTextArea.setForeground(new java.awt.Color(255, 255, 255));
         pseudoTextArea.setRows(5);
-        pseudoTextArea.setText("// Put your pseudocode here !");
+        pseudoTextArea.setText("$ Put your pseudocode here !");
         pseudoTextArea.setBorder(javax.swing.BorderFactory.createCompoundBorder(null, javax.swing.BorderFactory.createEmptyBorder(1, 20, 1, 1)));
         pseudoTextArea.setCaretColor(new java.awt.Color(255, 255, 255));
         pseudoTextArea.setDisabledTextColor(new java.awt.Color(230, 230, 230));
