@@ -1,5 +1,5 @@
 <h1 align="center" style="display: block; font-size: 2.5em; font-weight: bold; margin-block-start: 1em; margin-block-end: 1em;">
-<a name="logo"><img align="center" src="https://github.com/GuillermoX/GuillermoX/blob/main/.github/img/PseudoTest.png" alt="" style="width:15%;height:25%"/></a>
+<a name="logo"><img align="center" src="https://github.com/GuillermoX/GuillermoX/blob/main/.github/img/PseudoTestBanner.png" alt="" style="width:100%;height:100%"/></a>
   <br /><br /><strong>PseudoTest</strong>
 </h1>
 
@@ -14,8 +14,9 @@
 
 | Plataforma  | Última versión   |
 |-----------|---------------|
-| Windows   | [beta.1-v.1.0.0](https://github.com/GuillermoX/PseudoTest/releases/tag/windows) | 
+| Windows   | [beta.1-v.1.0.0](https://github.com/GuillermoX/PseudoTest/releases/tag/windows) |
 | Linux     | [beta.1-v.1.0.0](https://github.com/GuillermoX/PseudoTest/releases/tag/linux)|
+
 > [!NOTE]
 > La versión para Mac estará disponible pronto.
 
@@ -23,6 +24,9 @@
 1. Descarga la versión para tu sistema operativo de uno de los enlaces de la tabla anterior.
 2. Descomprime el archivo ZIP.
 3. Ejecuta la aplicación que se encuentra dentro de la carpeta PseudoTest.
+> [!TIP]
+> Si usas Windows puede ser que Windows Defender te bloquee la ejecución del programa. Cuando esto ocurra presiona "Más opciones" -> "Ejecutar de todos modos".
+
 > [!CAUTION]
 > No muevas la aplicación fuera de la carpeta. Si quieres añadirla al escritorio utiliza un acceso directo.
 
