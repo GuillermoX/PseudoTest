@@ -9,18 +9,25 @@ ftipus
 
 $ Funció de prova
 funcio boolProva(param1: enter, var param2: real) retorna boolea        $ Prova de comentari
-
+	
     const
         C <- 2
         CONST_FLOAT <- 3.3
         CONST_CHAR <- 'a'
     fconst
+
+	var 
+		a: real
+	fvar
     
-    retorna 2 + boolProva (1, param1)    
+    retorna 2 + boolProva (1, a)    
 ffuncio
 
 funcio pruebaFunc2(param1:enter,var param2:enter)retorna enter
-    boolProva(2, param2)
+	var
+		b: real
+	fvar
+    boolProva(2, b)
     param1 <- param1 + 1
     retorna param1
 ffuncio
@@ -38,20 +45,20 @@ funcio pruebaFunc (var param1: enter, var param2: real, var param3: booleà) ret
         d : boolea
         f, g: taula [20] de reals
         k, j: taula [20][10] d'enters
-        j: tipus_prueba_t
+        l: tipus_prueba_t
     fvar
 
     inici
 
 
     param2 <- param2 + 2
-    param2 <- pruebaFunc2(43, param2)
+    param2 <- pruebaFunc2(43, param1)
 
     si (boolProva(a, f[0])) llavors
         b <- 1
     fsi
 
-    d <- no k i no(k = 2) o (no(no(  k=9)))
+    d <- no(a = 2) o (no(no(  a=9)))
     fer
         a <- param2 div 2 
         si (param2 = param1) llavors
@@ -77,6 +84,7 @@ accio pruebaAccio (param1: enter, var param4: enter)
         x, m: enter
         k: booleà
         param2: enter
+		r: real
     fvar
 
     mentre (param2 < param4) fer
@@ -97,7 +105,7 @@ accio pruebaAccio (param1: enter, var param4: enter)
             m <- 45
     fopcio
 
-    pruebaFunc(param4, m, k)
+    pruebaFunc(param4, r, k)
 
     si ((no k) i no(k = 2) o (no(no(  k=9)))) llavors
         
@@ -119,6 +127,7 @@ algorisme
     var
         a, k, p, b, x: enter
         e: booleà
+		r: real
     fvar
 
     inici
@@ -133,7 +142,7 @@ algorisme
 
     p <- 90
 
-    si (no(pruebaFunc(x, k, a))) llavors
+    si (no(pruebaFunc(x, r, e))) llavors
         a <- 43 + 32
     sino
         a <- 80

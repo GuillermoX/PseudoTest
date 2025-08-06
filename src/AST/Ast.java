@@ -425,6 +425,7 @@ public class Ast {
         ArrayList<String> code = new ArrayList<>();
         
         sw = "#include <stdbool.h>\n";
+        sw += "#include <stdio.h>\n";
 
         root.printNode(code);
 
@@ -774,8 +775,9 @@ public class Ast {
             else{
                 i = 0;
                 while(i < params.length && i < paramsFunct.size()){
-                    //TODO: Check if variable is also IO param in function
                     if(paramsFunct.get(i).isIO()) params[i] = "&" + "(" + params[i] + ")";
+                    //If load matrix function it's needed a cast
+                    if((functName.compareToIgnoreCase("obtenir_dades_matriu") == 0) && i == 0) params[i] = "(int*)" + params[i];
                     i++;
                 }
             }

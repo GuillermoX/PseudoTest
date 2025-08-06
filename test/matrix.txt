@@ -1,0 +1,29 @@
+$ Put your PseudoCode here !
+algorisme
+    $ Declaració variables
+    var     
+		m: taula[10][20] d'enters
+        max, n_elems: enter
+		maxf, maxc, nf, nc: enter
+		i, j, temp: enter
+    fvar
+	
+	maxf <- 10
+	maxc <- 20
+	obtenir_dades_matriu (m, maxf, maxc, nf, nc) 
+	
+	per i <- 0 fins nf-1 fer
+		per j<-0 fins nc - 1 fer
+			temp <- m[i][j]
+			escriure(temp, " ")
+		fper
+		escriure("\n")
+	fper
+
+
+falgorisme
+
+
+
+$ Thanks for using PseudoTest :)
+$ - CodeURV Team
