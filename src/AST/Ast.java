@@ -36,13 +36,33 @@ public class Ast {
     private NodeAVL current;
     private NodeAVL currentFunct;
     private NodeAVL lastCurrent;    //To save current when changing to other spaces
-    private NodeAVL cnst;   //Constant block
+    private NodeAVL cnst;           //Constant block
     private ArrayList<FunctionBlock> functions;
 
     public Ast(){
         initializeAst();
     }
 
+
+    /**
+     * Initializes the Ast structure
+     */
+    public void initializeAst(){
+
+        root = new Block();
+        root.setLvl(-1);
+        current = root;
+        ConstantDefBlock constBlock = new ConstantDefBlock();
+        ((Block)current).addBodyPart(constBlock);
+        cnst = constBlock;
+        functions = new ArrayList<>();
+    }
+
+    /**
+     * Adds a code line to the Ast structure
+     * @param String codeLine The current line of code
+     * @return boolean finished True if the code has reached the last line
+     */
     public boolean addCode(String codeLine) throws UnknownInstructionException, SyntaxException, UnknownFunctionCallException{
 
         boolean finished = false;
@@ -79,7 +99,13 @@ public class Ast {
     }
 
 
-
+    /**
+     * Adds the tokenized instruction to the Ast
+     * @param tokens Tokenized instruction
+     * @throws UnknownInstructionException
+     * @throws SyntaxException
+     * @throws UnknownFunctionCallException
+     */
     public void addInstruct(String[] tokens) throws UnknownInstructionException, SyntaxException, UnknownFunctionCallException{
 
         Queue<NodeAVL> newNodes = new ArrayDeque<>();        //Stack to add at the end all the new Nodes
@@ -386,52 +412,12 @@ public class Ast {
     }
 
 
-    public void initializeAst(){
-
-        root = new Block();
-        root.setLvl(-1);
-        current = root;
-        ConstantDefBlock constBlock = new ConstantDefBlock();
-        ((Block)current).addBodyPart(constBlock);
-        cnst = constBlock;
-        functions = new ArrayList<>();
-    }
-
-    public void printCode(){
-        ArrayList<String> code = new ArrayList<>();
-
-        root.printNode(code);
-
-        for(String s : code){
-            System.out.println(s);
-        }
-    }
-
-
-    public int printCode(String filePath){
-        try{
-
-            BufferedWriter fw = new BufferedWriter(new FileWriter(filePath));
-            ArrayList<String> code = new ArrayList<>();
-            
-            fw.write("#include <stdbool.h>");
-            fw.newLine();
-
-            root.printNode(code);
-
-            for(String s : code){
-                fw.write(s);
-                fw.newLine();
-            }
-
-            fw.close();
-
-            return 0;
-        }
-        catch(IOException e){return -1;}
-    }
-
-
+    /**
+     * Returns all the Ast structure into the form of C language
+     * @return String The code translated into C 
+     * @throws IOException
+     * @throws UnknownFunctionCallException
+     */
     public String printCodeString() throws IOException, UnknownFunctionCallException{
 
         String sw = "";
@@ -478,8 +464,14 @@ public class Ast {
         
     }
 
-
-
+    /**
+     * Loads the Ast with the pseudocode from a the file specified
+     * @param path  File path
+     * @throws UnknownFunctionCallException
+     * @throws UnknownInstructionException
+     * @throws SyntaxException
+     * @throws IOException
+     */ 
     public void loadCodeFromFile(String path) throws UnknownFunctionCallException, UnknownInstructionException, SyntaxException, IOException{
 
 
@@ -520,7 +512,14 @@ public class Ast {
 
     }
 
-
+    /**
+     * Loads the Ast with the pseudocode in a String
+     * @param code String The pseudocode
+     * @throws UnknownFunctionCallException
+     * @throws UnknownInstructionException
+     * @throws SyntaxException
+     * @throws IOException
+     */
     public void loadCode(String code) throws UnknownFunctionCallException, UnknownInstructionException, SyntaxException, IOException{
         this.initializeAst();
 
@@ -556,8 +555,13 @@ public class Ast {
     }
 
 
-
-
+    /**
+     * Replaces some format differences between PseudoCode and C
+     * @param line
+     * @return
+     * @throws UnknownFunctionCallException
+     * @throws SyntaxException
+     */
     private String replaceFormatExpresion(String line) throws UnknownFunctionCallException, SyntaxException{
 
         line = line.replace(" i ", " && ");
@@ -587,6 +591,11 @@ public class Ast {
         return line;
     }
 
+    /**
+     * Returns the expected finishing block when finishing-block statements don't match to the current block context
+     * @param block
+     * @return  String Expected finishing block
+     */
     private static String getExpectedFinishBlock(NodeAVL block){
         String finish = "";
         if(block instanceof IfBlock) finish = "\"fsi\"";
@@ -597,6 +606,11 @@ public class Ast {
         return finish;
     }
 
+    /**
+     * Splits a code line in tokens
+     * @param text PseudoCode line
+     * @return  ArrayList<String> Tokenized code line
+     */
     private static ArrayList<String> splitTokens(String text) {
         ArrayList<String> tokens = new ArrayList<>();
         StringBuilder currentToken = new StringBuilder();
@@ -669,49 +683,21 @@ public class Ast {
 
         return tokens;
     }
-
-    private static boolean isSeparatorChar(char c, char nextChar, String prevToken){
-        char prevChar = ' ';
-
-        return false;
-    }
+    
 
     private static boolean isValidChar(char c){
         return Character.isLetter(c) || Character.isDigit(c) || c == ']';
     }
 
-    private static int isDeclaration(String[] tokens){
-        boolean found = false;
-        int i = tokens.length-1;
-        //Find ":"
-        while(!found && i>=0){
-            found = tokens[i].contains(":");
-            i--;
-        }
-        i ++;
 
-        if(found){
-            int diff = (tokens.length - (i+1));
-            if(diff > 1){   //check if it's table, because it may be a switch case
-                found = false;
-                int j = tokens.length-1;
-                while(!found && j>=0){
-                    found = tokens[j].contains("taula");
-                    j--;
-                }
-
-                if(!found) i = -1;
-            }
-            else if(diff == 0) i = -1;      //it must be switch case
-        }
-        else{
-            i = -1;
-        }
-
-        return i;
-    }
-
-
+    /**
+     * Corrects the parameters syntax depending if params are I/O or not
+     * @param functName Name of the function
+     * @param params    Parameters
+     * @return          Parameters corrected
+     * @throws UnknownFunctionCallException
+     * @throws SyntaxException
+     */
     private ArrayList<String> getParamsCorrected(String functName, String[] params) throws UnknownFunctionCallException, SyntaxException {
 
         ArrayList<String> retParams = new ArrayList<>();
@@ -764,8 +750,7 @@ public class Ast {
         }
         else if(isUserFunction(functName)){
 
-
-            //Get dimension of table if first param is table
+            //Add library function if necessary
             addLibFunction(functName);
 
             //Check if function exists
@@ -810,6 +795,11 @@ public class Ast {
         return retParams;
     }
 
+    /**
+     * Adds the library function definition in the Ast if the function called is from library
+     * @param name  Name of the function called
+     * @throws SyntaxException
+     */
     private void addLibFunction(String name) throws SyntaxException{
         FunctionBlock newFunct = null;
         ArrayList<String>[] params = null;
@@ -883,6 +873,11 @@ public class Ast {
         }
     }
 
+    /**
+     * Checks if the function specified is a user function
+     * @param name
+     * @return
+     */
     private static boolean isUserFunction(String name){
         return !(name.compareToIgnoreCase("obrir_fitxer_per_llegir") == 0 ||
                 name.compareToIgnoreCase("obrir_fitxer_per_escriure") == 0 ||
@@ -892,6 +887,11 @@ public class Ast {
                 name.compareToIgnoreCase("tancar_fitxer") == 0);
     }
 
+    /**
+     * Returns the C name for I/O functions used in pseudo
+     * @param functName PseudoCode function name
+     * @return          C name of the function
+     */
     private static String changeNameFunction(String functName){
         if(functName.compareToIgnoreCase("escriure") == 0) return "printf";
         else if(functName.compareToIgnoreCase("llegir") == 0) return "scanf";
@@ -905,6 +905,12 @@ public class Ast {
         else return "";
     }
 
+    /**
+     * Checks the type of a variable using it's name and definition
+     * @param var   Variable name
+     * @return      Variable Type
+     * @throws SyntaxException  If variable not declared
+     */
     private Types getVarType(String var) throws SyntaxException{
         Types type = Types.STRUCT;  //Initialize to avoid return error (no impact)
         var = var.replace(" ", "");
@@ -943,6 +949,13 @@ public class Ast {
 
     }
 
+    /**
+     * Checks for a function call inside a code line and corrects it
+     * @param codeLine  Pseudocode line
+     * @return  String The corrected line
+     * @throws UnknownFunctionCallException
+     * @throws SyntaxException
+     */
     private String getInLineFunctionCallCorrected(String codeLine) throws UnknownFunctionCallException, SyntaxException{
         StringBuilder line = new StringBuilder();
         StringBuilder functName = new StringBuilder();
@@ -984,12 +997,9 @@ public class Ast {
                 
                 String name = changeNameFunction(functName.toString());
                 if(name.compareToIgnoreCase("") != 0){
-                    String test = line.toString();
                     int start = line.indexOf(functName.toString());
                     int end = start + functName.toString().length();
                     line.replace(start, end, name);
-                    test = line.toString();
-                    test = line.toString();
                 }
                 i = j;
                 functName.setLength(0);
@@ -1015,7 +1025,11 @@ public class Ast {
         return lineStr;
     }
 
-
+    /**
+     * Splits the String of parameters of a functions in individual parameter strings
+     * @param tokenParam    All parameters in a String
+     * @return ArrayList<String>    Parameters split
+     */
     private static ArrayList<String>[] functionParamsParser(String tokenParam){
 
         tokenParam = tokenParam.substring(0, tokenParam.length());
