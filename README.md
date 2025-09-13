@@ -11,7 +11,7 @@
 <!-- markdownlint-disable -->
 
 ## Descargar ejecutable ⬇️
-Escoje el archivo ZIP correspondiente a tu sistema en el siguiente link
+Escoje el archivo ZIP correspondiente a tu sistema.
 | Plataforma  | Última versión   |
 |-----------|---------------|
 | Windows   | [pseudotest-windows-1.1.1-beta.1.zip](https://github.com/GuillermoX/PseudoTest/releases/download/v1.1.1-beta.1/pseudotest-windows-1.1.1-beta.1.zip) |
@@ -179,6 +179,7 @@ Si surge cualquier duda, no dudeis en contactar conmigo a través de Github, Lin
 
 
 <!-- markdownlint-enable -->
+
 
 
 
