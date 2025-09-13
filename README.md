@@ -16,9 +16,7 @@ Escoje el archivo ZIP correspondiente a tu sistema.
 |-----------|---------------|
 | Windows   | [beta.1-v.1.1.1](https://github.com/GuillermoX/PseudoTest/releases/tag/v1.1.1-beta.1) |
 | Linux     | [beta.1-v.1.1.1](https://github.com/GuillermoX/PseudoTest/releases/tag/v1.1.1-beta.1)|
-
-> [!NOTE]
-> La versión para Mac estará disponible pronto.
+| MacOS		| [beta.1-v.1.1.1](https://github.com/GuillermoX/PseudoTest/releases/tag/v1.1.1-beta.1)|
 
 ### Cómo instalar
 1. Descarga la versión para tu sistema operativo de uno de los enlaces de la tabla anterior.
@@ -181,6 +179,7 @@ Si surge cualquier duda, no dudeis en contactar conmigo a través de Github, Lin
 
 
 <!-- markdownlint-enable -->
+
 
 
 
