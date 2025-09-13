@@ -14,9 +14,9 @@
 Escoje el archivo ZIP correspondiente a tu sistema en el siguiente link
 | Plataforma  | Última versión   |
 |-----------|---------------|
-| Windows   | [beta.1-v.1.1.1](https://github.com/GuillermoX/PseudoTest/releases/download/v1.1.1-beta.1/pseudotest-windows-1.1.1-beta.1.zip) |
-| Linux     | [beta.1-v.1.1.1](https://github.com/GuillermoX/PseudoTest/releases/download/v1.1.1-beta.1/pseudotest-linux-1.1.1-beta.1.zip)|
-| MacOS		| [beta.1-v.1.1.1](https://github.com/GuillermoX/PseudoTest/releases/download/v1.1.1-beta.1/pseudotest-macos-1.1.1-beta.1.zip)|
+| Windows   | [pseudotest-windows-1.1.1-beta.1.zip](https://github.com/GuillermoX/PseudoTest/releases/download/v1.1.1-beta.1/pseudotest-windows-1.1.1-beta.1.zip) |
+| Linux     | [pseudotest-linux-1.1.1-beta.1.zip](https://github.com/GuillermoX/PseudoTest/releases/download/v1.1.1-beta.1/pseudotest-linux-1.1.1-beta.1.zip)|
+| MacOS		| [pseudotest-macos-1.1.1-beta.1.zip](https://github.com/GuillermoX/PseudoTest/releases/download/v1.1.1-beta.1/pseudotest-macos-1.1.1-beta.1.zip)|
 
 ### Cómo instalar
 1. Descarga la versión para tu sistema operativo de uno de los enlaces de la tabla anterior.
@@ -179,6 +179,7 @@ Si surge cualquier duda, no dudeis en contactar conmigo a través de Github, Lin
 
 
 <!-- markdownlint-enable -->
+
 
 
 
