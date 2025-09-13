@@ -18,12 +18,22 @@ Escoje el archivo ZIP correspondiente a tu sistema.
 | Linux     | [pseudotest-linux-1.1.1-beta.1.zip](https://github.com/GuillermoX/PseudoTest/releases/download/v1.1.1-beta.1/pseudotest-linux-1.1.1-beta.1.zip)|
 | MacOS		| [pseudotest-macos-1.1.1-beta.1.zip](https://github.com/GuillermoX/PseudoTest/releases/download/v1.1.1-beta.1/pseudotest-macos-1.1.1-beta.1.zip)|
 
+> [!WARNING]
+> Puede ser que tu sistema te bloquee la ejecución del programa. Sigue las instrucciones para solucionarlo.
+>
+>  Windows: Presiona "Más opciones" -> "Ejecutar de todos modos".
+> 
+> MacOS: Haz clic derecho sobre el icono y dale a "Abrir" -> "Abrir".
+
 ### Cómo instalar
 1. Descarga la versión para tu sistema operativo de uno de los enlaces de la tabla anterior.
 2. Descomprime el archivo ZIP.
-3. Ejecuta la aplicación que se encuentra dentro de la carpeta PseudoTest.
-> [!TIP]
-> Si usas Windows puede ser que Windows Defender te bloquee la ejecución del programa. Cuando esto ocurra presiona "Más opciones" -> "Ejecutar de todos modos".
+3. Ejecuta PseudoTest segun tu sistema.
+   
+   Windows/Linux: Ejecuta la aplicación que se encuentra dentro de la carpeta PseudoTest.
+   
+   MacOS: Clic derecho sobre el icono de PseudoTest y "Abrir".
+
 
 > [!CAUTION]
 > No muevas la aplicación fuera de la carpeta. Si quieres añadirla al escritorio utiliza un acceso directo.
@@ -179,6 +189,7 @@ Si surge cualquier duda, no dudeis en contactar conmigo a través de Github, Lin
 
 
 <!-- markdownlint-enable -->
+
 
 
 
