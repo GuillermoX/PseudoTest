@@ -36,7 +36,7 @@ Escoje el archivo ZIP correspondiente a tu sistema.
 
 
 > [!CAUTION]
-> No muevas la aplicación fuera de la carpeta. Si quieres añadirla al escritorio utiliza un acceso directo.
+> Windows/Linux: No muevas la aplicación fuera de la carpeta. Si quieres añadirla al escritorio utiliza un acceso directo.
 
 ---
 
