@@ -23,7 +23,7 @@ Escoje el archivo ZIP correspondiente a tu sistema.
 >
 >  Windows: Presiona "Más opciones" -> "Ejecutar de todos modos".
 > 
-> MacOS: Haz clic derecho sobre el icono y dale a "Abrir" -> "Abrir". Si esto no funciona abre Configuración > Privacidad y Seguridad, en el apartado de Seguridad tienes que habilitar la ejecución de PseudoTest.
+> MacOS: Haz clic derecho sobre el icono y dale a "Abrir" -> "Abrir". Si esto no funciona abre Configuración -> Privacidad y Seguridad, en el apartado de Seguridad tienes que habilitar la ejecución de PseudoTest.
 
 ### Cómo instalar
 1. Descarga la versión para tu sistema operativo de uno de los enlaces de la tabla anterior.
@@ -175,6 +175,17 @@ javac -d out $(find src -name "*.java")
 jar cfm PseudoTest.jar Manifest.mf -C out .
 ```
 Esto generará el binario .jar que podrás ejecutar si tienes el JRE instalado.
+
+---
+
+## Responsabilidad del proyecto 📝
+
+Este proyecto ha sido desarrollado únicamente por mi persona. 
+Como socio de la asociación CodeURV cedo el proyecto al CodeURV Team. Sin embargo, queda bajo mi responsabilidad cualquier inconveniente, queja o reclamación sobre PseudoTest.
+
+Ya se ha comentado repetidas veces en este README que PseudoTest NO pretende ser una herramienta que exima del aprendizaje del lenguaje C en la asignatura de Fundamentos de Programación 1 de los grados de la URV. 
+PseudoTest pretende ser una herramienta de soporte para facilitar la corrección y depuración de los ejercicios propuestos en clase.
+Como desarrollador de PseudoTest no me hago responsable del mal uso que se le pueda dar a la herramienta.
 
 ---
 
